@@ -19,6 +19,7 @@ from src.api.recommendations import router as recommendations_router
 from src.api.search import router as search_router
 from src.api.pipeline import router as pipeline_router
 from src.utils.logger import get_logger
+from src.database.schema import SchemaManager
 
 logger = get_logger("fastapi")
 
@@ -27,6 +28,12 @@ app = FastAPI(
     version=Config.VERSION,
     description="Strategic Decision Intelligence Platform API",
 )
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Running database migrations...")
+    SchemaManager().create_tables()
+    logger.info("Database migrations complete.")
 
 # 1. CORS middleware (Strict)
 app.add_middleware(
