@@ -12,7 +12,7 @@ ROUND_SCORE = {
     "Series D": 85,
     "Series E": 90,
     "Series F": 95,
-    "IPO": 100
+    "IPO": 100,
 }
 
 

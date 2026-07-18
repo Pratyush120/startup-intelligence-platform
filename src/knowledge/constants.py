@@ -14,7 +14,7 @@ FUNDING_ROUNDS = [
     "Series F",
     "Bridge",
     "Debt",
-    "IPO"
+    "IPO",
 ]
 
 FUNDING_KEYWORDS = [
@@ -26,28 +26,17 @@ FUNDING_KEYWORDS = [
     "invested",
     "backed",
     "secured",
-    "capital"
+    "capital",
 ]
 
-HIRING_KEYWORDS = [
-    "hiring",
-    "recruiting",
-    "expanding team",
-    "jobs",
-    "career"
-]
+HIRING_KEYWORDS = ["hiring", "recruiting", "expanding team", "jobs", "career"]
 
-LAYOFF_KEYWORDS = [
-    "layoff",
-    "laid off",
-    "job cuts",
-    "downsizing"
-]
+LAYOFF_KEYWORDS = ["layoff", "laid off", "job cuts", "downsizing"]
 
 EXPANSION_KEYWORDS = [
     "expansion",
     "expands",
     "launches",
     "opens office",
-    "international"
+    "international",
 ]

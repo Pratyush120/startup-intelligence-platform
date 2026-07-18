@@ -4,7 +4,6 @@ Strategic Decision Intelligence Platform
 Main Entry Point — Phase 6 (Production Pipeline)
 """
 
-import json
 from src.pipeline.orchestrator import PipelineOrchestrator
 
 
@@ -41,7 +40,7 @@ def main():
         print(f"  Growth Outlook        : {brief.get('growthOutlook')}")
         print(f"  Confidence Score      : {brief.get('confidenceScore')}%")
         print()
-        print(f"  Primary Recommendation:")
+        print("  Primary Recommendation:")
         print(f"  {brief.get('primaryRecommendation')}")
         print()
 

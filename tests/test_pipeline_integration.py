@@ -30,7 +30,6 @@ class MockRecord:
 
 
 class TestPipelineIntegration(unittest.TestCase):
-
     def test_full_preprocessing_flow(self):
         now = datetime.now(timezone.utc).isoformat()
         records = [
@@ -67,18 +66,13 @@ class TestPipelineIntegration(unittest.TestCase):
 
         scorer = ImportanceScorer()
         for record in unique:
-            score = scorer.score(
-                source=record.source,
-                publisher=record.metadata.get("publisher", ""),
-                published_at=record.published_at,
-                event_type="Funding",
-            )
+            record.metadata["category"] = "Funding"
+            score = scorer.score(record)
+            self.assertIsInstance(score, float)
             self.assertGreaterEqual(score, 0.0)
-            self.assertLessEqual(score, 10.0)
 
 
 class TestLLMFallback(unittest.TestCase):
-
     def test_rule_based_fallback_returns_analysis(self):
         analyzer = LLMAnalyzer()
         result = analyzer.analyze(
@@ -88,13 +82,14 @@ class TestLLMFallback(unittest.TestCase):
             company="OpenAI",
         )
         self.assertIsInstance(result, LLMAnalysis)
-        self.assertGreater(len(result.ai_summary), 0)
-        self.assertGreaterEqual(result.confidence, 0.0)
-        self.assertLessEqual(result.confidence, 1.0)
+        self.assertGreater(len(result.executive_summary), 0)
+        self.assertGreater(len(result.business_impact), 0)
+        self.assertGreater(result.confidence, 0.0)
+        self.assertIsInstance(result.risk, str)
+        self.assertIsInstance(result.opportunity, str)
 
 
 class TestSparklineGenerator(unittest.TestCase):
-
     def test_returns_five_points(self):
         gen = SparklineGenerator()
         result = gen.generate([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])

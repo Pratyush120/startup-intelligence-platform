@@ -12,19 +12,12 @@ from src.intelligence.interpreters.acquisition import AcquisitionInterpreter
 
 
 class InterpreterRegistry:
-
     def load(self):
 
         return [
-
             FundingInterpreter(),
-
             HiringInterpreter(),
-
             LayoffInterpreter(),
-
             ExpansionInterpreter(),
-
-            AcquisitionInterpreter()
-
+            AcquisitionInterpreter(),
         ]

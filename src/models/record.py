@@ -10,7 +10,6 @@ from typing import Dict, Optional
 
 @dataclass
 class Record:
-
     source: str
 
     title: str

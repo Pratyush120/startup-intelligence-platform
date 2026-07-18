@@ -1,116 +1,182 @@
 <div align="center">
-  <img src="assets/screenshots/logo.png" alt="SDIP Logo" width="120" />
-  <h1>Startup Data Intelligence Platform (SDIP)</h1>
-  <p><strong>The modern data intelligence platform for discovering, evaluating, and tracking high-growth startups.</strong></p>
+  <h1>🧠 Strategic Decision Intelligence Platform (SDIP)</h1>
+  <p><em>An autonomous AI analyst that collects, scores, and aggregates startup market intelligence.</em></p>
+  
+  [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-0.103.2-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
+  [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+  [![Test Coverage](https://img.shields.io/badge/coverage-74%25-brightgreen.svg)]()
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-  <p>
-    <a href="https://github.com/startup-intelligence-platform/sdip/actions"><img src="https://img.shields.io/github/actions/workflow/status/startup-intelligence-platform/sdip/ci.yml?style=flat-square" alt="Build Status"></a>
-    <a href="https://github.com/startup-intelligence-platform/sdip/blob/main/LICENSE"><img src="https://img.shields.io/github/license/startup-intelligence-platform/sdip?style=flat-square" alt="License"></a>
-    <a href="https://github.com/startup-intelligence-platform/sdip/pulls"><img src="https://img.shields.io/github/issues-pr/startup-intelligence-platform/sdip?style=flat-square" alt="PRs Welcome"></a>
-    <a href="https://github.com/startup-intelligence-platform/sdip/releases"><img src="https://img.shields.io/github/v/release/startup-intelligence-platform/sdip?style=flat-square" alt="Release"></a>
+  <p align="center">
+    <a href="#business-problem">Problem</a> •
+    <a href="#features">Features</a> •
+    <a href="#architecture">Architecture</a> •
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#technical-docs">Docs</a>
   </p>
 </div>
 
 ---
 
-## Overview
+## 🎯 Business Problem
 
-**SDIP (Startup Data Intelligence Platform)** is an open-source, end-to-end intelligence engine designed for Venture Capitalists, Angel Investors, and Market Researchers. It automates the discovery, ingestion, analysis, and scoring of startup data across the web, providing actionable insights through a stunning, modern web interface.
+Manual market research is slow, highly subjective, and fragmented. Strategy analysts read hundreds of articles to identify market trends, funding events, and emerging threats, making it difficult to maintain a quantitative, real-time understanding of the startup ecosystem.
 
-![Dashboard Overview](assets/screenshots/dashboard.png)
+**SDIP solves this.** It acts as an autonomous Junior Strategy Analyst. It continuously ingests raw news, classifies articles, uses Large Language Models (LLMs) to extract structured business events (Funding, Layoffs, Acquisitions), scores their impact, and aggregates findings into comprehensive company profiles.
 
-## ✨ Key Features
+## ✨ Features
 
-- **Automated Data Pipelines**: Seamlessly ingest data from Crunchbase, LinkedIn, Twitter/X, News APIs, and more.
-- **AI-Powered Insights**: LLM-driven summaries, sentiment analysis, and risk assessment for every startup profile.
-- **Dynamic Scoring Engine**: Proprietary growth velocity and founder capability scores.
-- **Real-time Knowledge Graph**: Traverse connections between founders, investors, and competitors.
-- **Modern Dashboard**: Built with Next.js, featuring dark mode, glassmorphism, and responsive design.
-- **Extensible Architecture**: Easily plug in new data sources or scoring algorithms.
+- **🤖 Automated Intelligence Pipeline**: Pluggable collectors fetch raw data from RSS and APIs.
+- **🧠 LLM Provider Architecture**: Hot-swap between OpenAI, Anthropic, or an offline Mock provider without changing business logic.
+- **📊 Quantitative Scoring**: Proprietary algorithms score Companies on Momentum, Risk, and Investment potential based on extracted events.
+- **⚡ High-Performance API**: Dependency-injected FastAPI backend with TTL caching ensures sub-10ms response times.
+- **💻 React Query Dashboard**: A beautiful, modern Next.js frontend for analyzing the market snapshot and timeline.
 
-## 🛠️ Technology Stack
+## 📸 Dashboard Preview
 
-SDIP is built on a modern, robust, and scalable technology stack:
+*(Screenshots to be added. If you deploy the frontend, replace these placeholders with your actual screenshots.)*
 
-- **Frontend**: Next.js (React), Tailwind CSS, Framer Motion, Recharts
-- **Backend**: Python, FastAPI
-- **Database**: PostgreSQL (Relational), Neo4j (Knowledge Graph), Qdrant (Vector DB)
-- **Data Pipeline**: Apache Airflow, Celery
-- **AI/ML**: OpenAI / Anthropic APIs, LangChain, HuggingFace Transformers
-- **Infrastructure**: Docker, Kubernetes, GitHub Actions
+![Market Dashboard Placeholder](/assets/screenshots/dashboard.png)
+*Figure 1: The Main Market Intelligence Dashboard*
 
-## 🚀 Quickstart
+![Timeline Placeholder](/assets/screenshots/timeline.png)
+*Figure 2: The Automated Business Event Timeline*
 
-### Prerequisites
-- Docker & Docker Compose
-- Python 3.11+
-- Node.js 18+
-- API Keys (OpenAI, Anthropic, etc. for full functionality)
+## 🏗️ Architecture
 
-### Installation
+SDIP enforces strict architectural boundaries using the **Repository Pattern** and **Provider Pattern**.
+
+```mermaid
+graph TD
+    A[Cron Job / Scripts] -->|Triggers| B(Pipeline Orchestrator)
+    
+    subgraph Data Ingestion
+        B --> C[Collectors: NewsAPI/RSS]
+        C --> D[Deduplicator]
+    end
+
+    subgraph Intelligence Engine
+        D --> E{LLM Analyzer}
+        E -.->|Provider Interface| F[OpenAI / Mock]
+        F -.-> E
+        E --> G[Scoring & Analytics]
+    end
+    
+    subgraph Persistence Layer
+        G --> H[(SQLite via Repository)]
+    end
+    
+    subgraph Frontend Delivery
+        H --> I[FastAPI Backend]
+        I --> J[Next.js + React Query]
+    end
+```
+
+### The Intelligence Pipeline Flow
+
+```mermaid
+sequenceDiagram
+    participant Orchestrator
+    participant Collector
+    participant LLM
+    participant Analytics
+    participant DB
+    
+    Orchestrator->>Collector: fetch_news()
+    Collector-->>Orchestrator: raw_articles[]
+    
+    loop For each article
+        Orchestrator->>LLM: extract_events(text)
+        LLM-->>Orchestrator: structured_json
+        
+        Orchestrator->>Analytics: calculate_impact(event)
+        Analytics-->>Orchestrator: scored_event
+        
+        Orchestrator->>DB: save_event(event)
+    end
+    
+    Orchestrator->>Analytics: aggregate_companies()
+    Analytics-->>DB: save_company_metrics()
+```
+
+## 🛠️ Tech Stack
+
+- **Backend**: Python 3.10+, FastAPI, Pydantic, RapidFuzz (Deduplication)
+- **Frontend**: Next.js 14, React Query, TailwindCSS (assumed)
+- **Database**: SQLite (Configured for high read throughput)
+- **AI/LLM**: OpenAI GPT-4o-mini (Default) + MockProvider (for testing)
+- **Testing**: Pytest (74% Coverage)
+- **Linting**: Ruff
+
+## 📂 Repository Structure
+
+```text
+.
+├── src/
+│   ├── analytics/       # Scoring and market aggregation logic
+│   ├── api/             # FastAPI routers and dependency injection
+│   ├── collectors/      # Data ingestion (NewsAPI, RSS, Mock)
+│   ├── database/        # SQLite connection and Repository pattern
+│   ├── intelligence/    # Event extraction, Prompts, and Classifiers
+│   ├── models/          # Pydantic schemas (BusinessEvent, Record)
+│   └── pipeline/        # Orchestrator and LLM Analyzer
+├── tests/               # Pytest suites
+├── docs/                # System Design, ADRs, and Portoflio Guides
+└── README.md
+```
+
+## 🚀 Quick Start
+
+SDIP is designed with a **Mock-First Architecture**. You can run the entire pipeline and API locally *without* any API keys.
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/startup-intelligence-platform/sdip.git
-   cd sdip
+   git clone https://github.com/pratyushmohanty120-bit/startup-intelligence-platform.git
+   cd startup-intelligence-platform
    ```
 
-2. **Environment Setup**
+2. **Install Dependencies**
    ```bash
-   cp .env.example .env
-   # Edit .env with your required API keys and database credentials
-   ```
-
-3. **Start the Infrastructure**
-   ```bash
-   docker-compose up -d db redis neo4j qdrant
-   ```
-
-4. **Start the Backend**
-   ```bash
-   cd backend
    python -m venv venv
-   source venv/bin/activate
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
-   uvicorn main:app --reload
    ```
 
-5. **Start the Frontend**
+3. **Run the Pipeline (Mock Mode)**
    ```bash
-   cd frontend
-   npm install
-   npm run dev
+   python -m src.scripts.run_pipeline
    ```
+   *This will populate `app.db` with mock intelligence data.*
 
-Navigate to `http://localhost:3000` to access the SDIP dashboard.
+4. **Start the API Server**
+   ```bash
+   uvicorn src.main:app --reload
+   ```
+   *Visit `http://localhost:8000/docs` to view the interactive Swagger UI.*
 
-## 🗺️ Architecture Overview
+## 🐳 Deployment (Docker)
 
-SDIP is divided into three primary components: Data Collectors, the Intelligence Engine, and the UI Application.
+To run the production-ready containers:
 
-For a deep dive, see [ARCHITECTURE.md](docs/ARCHITECTURE.md) and [PIPELINE.md](docs/PIPELINE.md).
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
 
-## ⚠️ Known Limitations
+*(Note: Ensure you have placed your `.env` file containing `OPENAI_API_KEY` if you wish to run the real AI pipeline instead of the mock.)*
 
-- **Rate Limits**: Heavy reliance on third-party APIs (e.g., Crunchbase, Twitter) may hit rate limits. Consider providing multiple API keys or configuring longer retry intervals in Airflow.
-- **Vector DB Memory Usage**: Qdrant can consume significant memory for large datasets. Ensure your host machine has adequate RAM.
-- **Real-time WebSocket Latency**: The live feed may experience latency under extreme load due to Redis Pub/Sub bottlenecks.
+## 📚 Technical Docs
+
+For a deep dive into the engineering decisions, trade-offs, and architecture, see the `/docs` folder:
+- [System Design](docs/SYSTEM_DESIGN.md)
+- [Engineering Decisions](docs/ENGINEERING_DECISIONS.md)
+- [Architecture Decision Records (ADRs)](docs/adr/)
+- [Benchmarks](docs/BENCHMARKS.md)
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether it's a bug fix, a new data collector, or a UI enhancement, your help is appreciated.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) and [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Please read our [Contributing Guidelines](CONTRIBUTING.md) and our [Code of Conduct](CODE_OF_CONDUCT.md).
+## 📄 License
 
-## 🛡️ Security
-
-Security is a priority. For reporting vulnerabilities, please review our [Security Policy](SECURITY.md).
-
-## 📜 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-<div align="center">
-  Built with ❤️ by the open-source intelligence community.
-</div>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

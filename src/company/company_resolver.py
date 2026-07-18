@@ -15,7 +15,6 @@ from src.company.company_dictionary import (
 
 
 class CompanyResolver:
-
     def resolve(self, company_name):
 
         if not company_name:
@@ -36,18 +35,9 @@ class CompanyResolver:
         # Fuzzy Match
         # -------------------------
 
-        match = process.extractOne(
-
-            company_name,
-
-            KNOWN_COMPANIES,
-
-            score_cutoff=88
-
-        )
+        match = process.extractOne(company_name, KNOWN_COMPANIES, score_cutoff=88)
 
         if not match:
-
             return company_name
 
         company = match[0]
@@ -55,21 +45,13 @@ class CompanyResolver:
         info = COMPANIES.get(company)
 
         if not info:
-
             return company
 
         company_type = info["type"]
 
         # Ignore non-primary organizations
 
-        if company_type in {
-
-            "vc",
-
-            "law_firm"
-
-        }:
-
+        if company_type in {"vc", "law_firm"}:
             return None
 
         return company

@@ -15,14 +15,13 @@ HIRING_KEYWORDS = [
     "recruiting",
     "jobs",
     "workforce",
-    "expand team"
+    "expand team",
 ]
 
 NUMBER_PATTERN = re.compile(r"\b(\d{2,5})\b")
 
 
 class HiringInterpreter(BaseInterpreter):
-
     def interpret(self, record):
 
         text = f"{record.title} {record.description}"
@@ -37,51 +36,25 @@ class HiringInterpreter(BaseInterpreter):
         match = NUMBER_PATTERN.search(text)
 
         if match:
-
             hires = int(match.group(1))
 
         confidence = 0.8
 
         if hires:
-
             confidence = 0.95
 
         event = BusinessEvent(
-
             event_type="Hiring",
-
             company=None,
-
             title=record.title,
-
             source=record.source,
-
             published_at=record.published_at,
-
             confidence=confidence,
-
             impact_score=min((hires or 50) / 10, 100),
-
-            entities={
-
-                "estimated_hires": hires
-
-            },
-
-            evidence=[
-
-                "Hiring keyword detected"
-
-            ],
-
+            entities={"estimated_hires": hires},
+            evidence=["Hiring keyword detected"],
             reasoning="Rule-based hiring detection.",
-
-            tags=[
-
-                "hiring"
-
-            ]
-
+            tags=["hiring"],
         )
 
         return [event]

@@ -20,7 +20,6 @@ from src.knowledge.constants import (
 
 
 class FundingInterpreter(BaseInterpreter):
-
     def __init__(self):
 
         self.company_extractor = CompanyExtractor()
@@ -39,13 +38,7 @@ class FundingInterpreter(BaseInterpreter):
 
         text = text.lower()
 
-        return any(
-
-            keyword.lower() in text
-
-            for keyword in FUNDING_KEYWORDS
-
-        )
+        return any(keyword.lower() in text for keyword in FUNDING_KEYWORDS)
 
     # -----------------------------------------------------
 
@@ -54,9 +47,7 @@ class FundingInterpreter(BaseInterpreter):
         text = text.lower()
 
         for funding_round in FUNDING_ROUNDS:
-
             if funding_round.lower() in text:
-
                 return funding_round
 
         return None
@@ -72,18 +63,13 @@ class FundingInterpreter(BaseInterpreter):
         # ----------------------------------------------
 
         if not self.is_funding_article(text):
-
             return []
 
         # ----------------------------------------------
         # Article Classification
         # ----------------------------------------------
 
-        article_type = self.article_classifier.classify(
-
-            record.title
-
-        )
+        article_type = self.article_classifier.classify(record.title)
 
         # ----------------------------------------------
         # Company Extraction
@@ -92,12 +78,7 @@ class FundingInterpreter(BaseInterpreter):
         company = None
 
         if article_type == "Company Event":
-
-            company = self.company_extractor.extract(
-
-                record.title
-
-            )
+            company = self.company_extractor.extract(record.title)
 
         # ----------------------------------------------
         # Money Parsing
@@ -112,7 +93,6 @@ class FundingInterpreter(BaseInterpreter):
         raw_amount = None
 
         if money:
-
             amount = money["amount"]
 
             currency = money["currency"]
@@ -134,95 +114,50 @@ class FundingInterpreter(BaseInterpreter):
         # ----------------------------------------------
 
         confidence, evidence = self.confidence.funding(
-
             company=company,
-
             amount=amount,
-
             funding_round=funding_round,
-
             article_type=article_type,
-
-            source=record.source
-
+            source=record.source,
         )
 
         # ----------------------------------------------
         # Impact
         # ----------------------------------------------
 
-        impact_score = self.impact.funding(
-
-            funding_round=funding_round,
-
-            unit=unit
-
-        )
+        impact_score = self.impact.funding(funding_round=funding_round, unit=unit)
 
         # ----------------------------------------------
         # Build Event
         # ----------------------------------------------
 
         event = BusinessEvent(
-
             event_type="Funding",
-
             article_type=article_type,
-
             company=company,
-
             title=record.title,
-
             source=record.source,
-
             published_at=record.published_at,
-
             confidence=confidence,
-
             impact_score=impact_score,
-
             entities={
-
                 "amount": amount,
-
                 "display_amount": display_amount,
-
                 "raw_amount": raw_amount,
-
                 "currency": currency,
-
                 "unit": unit,
-
                 "round": funding_round,
-
             },
-
             evidence=evidence,
-
             reasoning=(
-
                 "Funding event detected using "
-
                 "article classification, "
-
                 "company extraction, "
-
                 "money parsing, "
-
                 "funding round detection "
-
                 "and confidence scoring."
-
             ),
-
-            tags=[
-
-                "funding",
-
-                "investment"
-
-            ]
-
+            tags=["funding", "investment"],
         )
 
         return [event]

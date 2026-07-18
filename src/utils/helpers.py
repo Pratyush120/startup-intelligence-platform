@@ -23,12 +23,6 @@ def save_raw_json(data, source_name):
     file_path = output_dir / f"{source_name}.json"
 
     with open(file_path, "w", encoding="utf-8") as file:
-
-        json.dump(
-            data,
-            file,
-            indent=4,
-            ensure_ascii=False
-        )
+        json.dump(data, file, indent=4, ensure_ascii=False)
 
     return file_path

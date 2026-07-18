@@ -9,7 +9,6 @@ from src.database.db import Database
 
 
 class SchemaManager:
-
     def __init__(self):
         self.db = Database()
 
@@ -38,8 +37,7 @@ class SchemaManager:
         )
         """)
         self.db.execute(
-            "CREATE INDEX IF NOT EXISTS idx_articles_processed "
-            "ON articles(processed)"
+            "CREATE INDEX IF NOT EXISTS idx_articles_processed ON articles(processed)"
         )
         self.db.execute(
             "CREATE INDEX IF NOT EXISTS idx_articles_published "
@@ -98,16 +96,13 @@ class SchemaManager:
         )
         """)
         self.db.execute(
-            "CREATE INDEX IF NOT EXISTS idx_events_company "
-            "ON events(company_name)"
+            "CREATE INDEX IF NOT EXISTS idx_events_company ON events(company_name)"
         )
         self.db.execute(
-            "CREATE INDEX IF NOT EXISTS idx_events_type "
-            "ON events(event_type)"
+            "CREATE INDEX IF NOT EXISTS idx_events_type ON events(event_type)"
         )
         self.db.execute(
-            "CREATE INDEX IF NOT EXISTS idx_events_published "
-            "ON events(published_at)"
+            "CREATE INDEX IF NOT EXISTS idx_events_published ON events(published_at)"
         )
 
         # =====================================================
@@ -226,8 +221,11 @@ class SchemaManager:
             companies_updated  INTEGER DEFAULT 0,
             errors             INTEGER DEFAULT 0,
             duration_seconds   REAL,
-            error_details      TEXT
+            error_details      TEXT,
+            llm_provider       TEXT,
+            total_tokens       INTEGER DEFAULT 0,
+            total_llm_time_ms  INTEGER DEFAULT 0
         )
         """)
 
-        self.db.close()
+        self.db.close()

@@ -19,9 +19,9 @@ from src.analytics.scoring_engine import CompanyScore
 # Company Intelligence Model
 # ==========================================================
 
+
 @dataclass
 class CompanyIntelligence:
-
     # ------------------------------------------------------
     # Identity
     # ------------------------------------------------------
@@ -105,21 +105,15 @@ class CompanyIntelligence:
 # Company Engine
 # ==========================================================
 
-class CompanyEngine:
 
+class CompanyEngine:
     """
     Converts engineered features and scores into complete
     company intelligence.
     """
 
     def build(
-
-        self,
-
-        features: CompanyFeatures,
-
-        scores: CompanyScore
-
+        self, features: CompanyFeatures, scores: CompanyScore
     ) -> CompanyIntelligence:
 
         strengths = []
@@ -135,267 +129,135 @@ class CompanyEngine:
         # ==================================================
 
         if features.funding_events:
-
-            strengths.append(
-                "Successfully attracted external investment."
-            )
+            strengths.append("Successfully attracted external investment.")
 
         if features.hiring_events:
-
-            strengths.append(
-                "Active hiring indicates business growth."
-            )
+            strengths.append("Active hiring indicates business growth.")
 
         if features.expansion_events:
-
-            strengths.append(
-                "Expansion activities indicate scaling."
-            )
+            strengths.append("Expansion activities indicate scaling.")
 
         if features.average_confidence >= 0.90:
-
-            strengths.append(
-                "Business intelligence confidence is very high."
-            )
+            strengths.append("Business intelligence confidence is very high.")
 
         if features.event_diversity >= 3:
-
-            strengths.append(
-                "Company demonstrates diversified strategic activity."
-            )
+            strengths.append("Company demonstrates diversified strategic activity.")
 
         # ==================================================
         # Weaknesses
         # ==================================================
 
         if features.layoff_events:
-
-            weaknesses.append(
-                "Layoff announcements increase operational uncertainty."
-            )
+            weaknesses.append("Layoff announcements increase operational uncertainty.")
 
         if features.event_diversity <= 1:
-
-            weaknesses.append(
-                "Limited strategic activity detected."
-            )
+            weaknesses.append("Limited strategic activity detected.")
 
         if features.average_confidence < 0.60:
-
-            weaknesses.append(
-                "Available intelligence has relatively low confidence."
-            )
+            weaknesses.append("Available intelligence has relatively low confidence.")
 
         # ==================================================
         # Opportunities
         # ==================================================
 
         if scores.growth_score >= 60:
-
-            opportunities.append(
-                "High growth opportunity."
-            )
+            opportunities.append("High growth opportunity.")
 
         if scores.investment_score >= 60:
-
-            opportunities.append(
-                "Attractive investment profile."
-            )
+            opportunities.append("Attractive investment profile.")
 
         if scores.influence_score >= 50:
-
-            opportunities.append(
-                "Increasing market influence."
-            )
+            opportunities.append("Increasing market influence.")
 
         if features.source_diversity >= 2:
-
-            opportunities.append(
-                "Coverage across multiple independent news sources."
-            )
+            opportunities.append("Coverage across multiple independent news sources.")
 
         # ==================================================
         # Threats
         # ==================================================
 
         if scores.risk_score >= 50:
-
-            threats.append(
-                "Operational risk requires monitoring."
-            )
+            threats.append("Operational risk requires monitoring.")
 
         if features.layoff_events > 1:
-
-            threats.append(
-                "Repeated workforce reductions detected."
-            )
+            threats.append("Repeated workforce reductions detected.")
 
         if scores.business_health < 40:
-
-            threats.append(
-                "Business health remains below healthy threshold."
-            )
+            threats.append("Business health remains below healthy threshold.")
 
         # ==================================================
         # Executive Summary
         # ==================================================
 
-        summary = self._summary(
-
-            features,
-
-            scores
-
-        )
+        summary = self._summary(features, scores)
 
         return CompanyIntelligence(
-
             # Identity
-
             company_name=features.company_name,
-
             # Raw Metrics
-
             total_events=features.total_events,
-
             funding_events=features.funding_events,
-
             hiring_events=features.hiring_events,
-
             layoff_events=features.layoff_events,
-
             expansion_events=features.expansion_events,
-
             acquisition_events=features.acquisition_events,
-
             total_funding=features.total_funding,
-
             average_confidence=features.average_confidence,
-
             average_impact=features.average_impact,
-
             event_diversity=features.event_diversity,
-
             source_diversity=features.source_diversity,
-
             momentum=features.momentum,
-
             latest_event=features.latest_event,
-
             latest_event_type=features.latest_event_type,
-
             latest_event_date=features.latest_event_date,
-
             # Scores
-
             business_health=scores.business_health,
-
             growth_score=scores.growth_score,
-
             investment_score=scores.investment_score,
-
             influence_score=scores.influence_score,
-
             risk_score=scores.risk_score,
-
             confidence_grade=scores.confidence_grade,
-
             recommendation=scores.recommendation,
-
             score_breakdown=scores.breakdown,
-
             # SWOT
-
             strengths=strengths,
-
             weaknesses=weaknesses,
-
             opportunities=opportunities,
-
             threats=threats,
-
             # Executive
-
-            executive_summary=summary
-
+            executive_summary=summary,
         )
 
     # ======================================================
 
-    def _summary(
-
-        self,
-
-        features: CompanyFeatures,
-
-        scores: CompanyScore
-
-    ) -> str:
+    def _summary(self, features: CompanyFeatures, scores: CompanyScore) -> str:
 
         lines = []
 
         lines.append(
-
             f"{features.company_name} generated "
-
             f"{features.total_events} strategic business events."
-
         )
 
         if features.funding_events:
-
-            lines.append(
-
-                "Funding activity reflects positive investor confidence."
-
-            )
+            lines.append("Funding activity reflects positive investor confidence.")
 
         if features.hiring_events:
-
-            lines.append(
-
-                "Hiring indicates organisational expansion."
-
-            )
+            lines.append("Hiring indicates organisational expansion.")
 
         if features.expansion_events:
-
-            lines.append(
-
-                "Expansion activity suggests market growth."
-
-            )
+            lines.append("Expansion activity suggests market growth.")
 
         if features.acquisition_events:
-
-            lines.append(
-
-                "Acquisition activity strengthens strategic positioning."
-
-            )
+            lines.append("Acquisition activity strengthens strategic positioning.")
 
         if features.layoff_events:
-
-            lines.append(
-
-                "Layoff events increase operational risk."
-
-            )
+            lines.append("Layoff events increase operational risk.")
 
         lines.append(
-
-            f"Overall Business Health Score is "
-
-            f"{scores.business_health:.1f}/100."
-
+            f"Overall Business Health Score is {scores.business_health:.1f}/100."
         )
 
-        lines.append(
-
-            f"Current strategic recommendation: "
-
-            f"{scores.recommendation}."
-
-        )
+        lines.append(f"Current strategic recommendation: {scores.recommendation}.")
 
         return " ".join(lines)

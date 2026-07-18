@@ -4,7 +4,6 @@ from typing import Optional
 
 @dataclass
 class Company:
-
     company_name: str
 
     canonical_name: Optional[str] = None
@@ -20,4 +19,3 @@ class Company:
     linkedin: Optional[str] = None
 
     startup_india_id: Optional[str] = None
-    

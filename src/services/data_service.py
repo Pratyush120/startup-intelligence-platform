@@ -12,7 +12,6 @@ from src.database.db import Database
 
 
 class DataService:
-
     def __init__(self):
 
         self.db = Database()
@@ -114,11 +113,9 @@ class DataService:
         row = self.db.fetchone()
 
         if row:
-
             summary["top_source"] = row["source"]
 
         else:
-
             summary["top_source"] = "N/A"
 
         return summary
@@ -129,7 +126,8 @@ class DataService:
 
     def get_top_companies_df(self, limit=10):
 
-        self.db.execute("""
+        self.db.execute(
+            """
 
             SELECT
 
@@ -156,16 +154,12 @@ class DataService:
             LIMIT ?
 
         """,
-
-        (limit,))
+            (limit,),
+        )
 
         rows = self.db.fetchall()
 
-        return pd.DataFrame(
-
-            [dict(x) for x in rows]
-
-        )
+        return pd.DataFrame([dict(x) for x in rows])
 
     # =====================================================
     # RECENT EVENTS
@@ -173,7 +167,8 @@ class DataService:
 
     def get_recent_events_df(self, limit=20):
 
-        self.db.execute("""
+        self.db.execute(
+            """
 
             SELECT
 
@@ -198,16 +193,12 @@ class DataService:
             LIMIT ?
 
         """,
-
-        (limit,))
+            (limit,),
+        )
 
         rows = self.db.fetchall()
 
-        return pd.DataFrame(
-
-            [dict(x) for x in rows]
-
-        )
+        return pd.DataFrame([dict(x) for x in rows])
 
     # =====================================================
     # EVENT BREAKDOWN
@@ -233,11 +224,7 @@ class DataService:
 
         rows = self.db.fetchall()
 
-        return pd.DataFrame(
-
-            [dict(x) for x in rows]
-
-        )
+        return pd.DataFrame([dict(x) for x in rows])
 
     # =====================================================
     # FUNDING LEADERBOARD
@@ -245,7 +232,8 @@ class DataService:
 
     def get_top_funding_df(self, limit=10):
 
-        self.db.execute("""
+        self.db.execute(
+            """
 
             SELECT
 
@@ -266,16 +254,12 @@ class DataService:
             LIMIT ?
 
         """,
-
-        (limit,))
+            (limit,),
+        )
 
         rows = self.db.fetchall()
 
-        return pd.DataFrame(
-
-            [dict(x) for x in rows]
-
-        )
+        return pd.DataFrame([dict(x) for x in rows])
 
     # =====================================================
     # COMPANY PROFILE
@@ -283,7 +267,8 @@ class DataService:
 
     def get_company_profile(self, company):
 
-        self.db.execute("""
+        self.db.execute(
+            """
 
             SELECT *
 
@@ -292,13 +277,12 @@ class DataService:
             WHERE company_name=?
 
         """,
-
-        (company,))
+            (company,),
+        )
 
         row = self.db.fetchone()
 
         if row:
-
             return dict(row)
 
         return None
@@ -309,7 +293,8 @@ class DataService:
 
     def get_company_events_df(self, company):
 
-        self.db.execute("""
+        self.db.execute(
+            """
 
             SELECT
 
@@ -332,16 +317,12 @@ class DataService:
             ORDER BY published_at DESC
 
         """,
-
-        (company,))
+            (company,),
+        )
 
         rows = self.db.fetchall()
 
-        return pd.DataFrame(
-
-            [dict(x) for x in rows]
-
-        )
+        return pd.DataFrame([dict(x) for x in rows])
 
     # =====================================================
     # ALL COMPANIES
@@ -359,13 +340,7 @@ class DataService:
 
         """)
 
-        return [
-
-            row["company_name"]
-
-            for row in self.db.fetchall()
-
-        ]
+        return [row["company_name"] for row in self.db.fetchall()]
 
     # =====================================================
 

@@ -6,26 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.0.0] - 2026-07-18
-
 ### Added
-- **Core Engine**: Initial release of the intelligence pipeline and scoring system.
-- **Collectors**: Integrated Crunchbase, LinkedIn, and Twitter/X data scrapers.
-- **Frontend**: Shipped the Next.js dark-mode dashboard with Tailwind CSS.
-- **AI Processing**: LLM-driven summarization for startup profiles.
-- **Database**: Full support for PostgreSQL, Neo4j, and Qdrant vector search.
-- **API**: Extensive FastAPI REST endpoints for data consumption.
-- **CI/CD**: GitHub Actions workflow for linting, testing, and building.
-
-### Changed
-- Re-architected the Airflow DAG structure to support parallel data collection.
-- Upgraded the frontend charting library to Recharts for smoother animations.
-- Refactored the Neo4j schema for optimized knowledge graph queries.
+- **Core Engine**: Full Intelligence Pipeline (Extraction, Classification, LLM Analysis, Entity Resolution, Sparkline Generation).
+- **Architecture**: Solidified Repository and Provider patterns for dependency injection.
+- **API**: FastAPI implementation with production-ready endpoints (`/market/snapshot`, `/timeline`, `/search`, `/companies`).
+- **UI**: Next.js React-Query frontend with dynamic dashboards and interactive market sentiment analysis.
+- **Data Persistence**: SQLite schema with robust indexing, pipeline execution auditing, and snapshot histories.
+- **Testing**: Reached > 74% coverage using Pytest.
 
 ### Fixed
-- Fixed an issue where the Twitter collector would silently fail on rate limits.
-- Resolved a memory leak in the Qdrant ingestion script.
-- Patched a vulnerability in the JWT authentication middleware.
-
-### Known Issues
-- Rate limiting on third-party APIs can occasionally stall pipeline runs.
-- WebSockets for real-time updates may drop connections behind certain reverse proxies.
+- Fixed rate-limiting constraints by introducing robust offline Mock Collectors.
+- Fixed database lock errors and concurrency bottlenecks via isolated repository instances.
+- Re-architected `Deduplicator` to reduce dependency coupling.

@@ -8,7 +8,6 @@ from collections import Counter
 
 
 class AnalyticsEngine:
-
     def summarize(self, events):
 
         summary = {}
@@ -20,11 +19,9 @@ class AnalyticsEngine:
         company_counter = Counter()
 
         for event in events:
-
             counter[event.event_type] += 1
 
             if event.company:
-
                 company_counter[event.company] += 1
 
         summary["event_breakdown"] = dict(counter)

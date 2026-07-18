@@ -5,11 +5,9 @@ Maps organization names to their roles.
 """
 
 COMPANIES = {
-
     # -----------------------
     # Startups
     # -----------------------
-
     "Rapido": {"type": "startup"},
     "Razorpay": {"type": "startup"},
     "PhonePe": {"type": "startup"},
@@ -28,22 +26,18 @@ COMPANIES = {
     "Finnovate": {"type": "startup"},
     "SaffronStays": {"type": "startup"},
     "JustAI": {"type": "startup"},
-
     # -----------------------
     # Big Tech
     # -----------------------
-
     "Amazon": {"type": "company"},
     "Google": {"type": "company"},
     "Microsoft": {"type": "company"},
     "Meta": {"type": "company"},
     "Apple": {"type": "company"},
     "OpenAI": {"type": "company"},
-
     # -----------------------
     # Venture Capital
     # -----------------------
-
     "Lightspeed": {"type": "vc"},
     "Sequoia": {"type": "vc"},
     "Peak XV": {"type": "vc"},
@@ -55,11 +49,9 @@ COMPANIES = {
     "Blume Ventures": {"type": "vc"},
     "Elevation Capital": {"type": "vc"},
     "Inflection Point Ventures": {"type": "vc"},
-
     # -----------------------
     # Advisors
     # -----------------------
-
     "Trilegal": {"type": "law_firm"},
     "CAM": {"type": "law_firm"},
     "TT&A": {"type": "law_firm"},

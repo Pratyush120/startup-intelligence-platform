@@ -25,6 +25,7 @@ def _now_iso() -> str:
 # Matches: ExecutiveBrief (TypeScript)
 # ===========================================================================
 
+
 def serialize_executive_brief(
     brief_id: str,
     market_health_score: float,
@@ -42,9 +43,9 @@ def serialize_executive_brief(
         "id": str(brief_id),
         "date": _now_iso(),
         "marketHealthScore": round(market_health_score, 1),
-        "investmentClimate": investment_climate,   # "Favorable" | "Neutral" | "Hostile"
-        "riskLevel": risk_level,                    # "Critical" | "High" | "Medium" | "Low"
-        "growthOutlook": growth_outlook,            # "Accelerating" | "Stable" | "Decelerating"
+        "investmentClimate": investment_climate,  # "Favorable" | "Neutral" | "Hostile"
+        "riskLevel": risk_level,  # "Critical" | "High" | "Medium" | "Low"
+        "growthOutlook": growth_outlook,  # "Accelerating" | "Stable" | "Decelerating"
         "strategicSummary": strategic_summary,
         "confidenceScore": round(confidence_score * 100, 1),
         "primaryRecommendation": primary_recommendation,
@@ -55,6 +56,7 @@ def serialize_executive_brief(
 # Metric Cards
 # Matches: MetricCard[] (TypeScript)
 # ===========================================================================
+
 
 def serialize_metric_cards(
     total_companies: int,
@@ -77,7 +79,7 @@ def serialize_metric_cards(
             "id": "m_companies",
             "label": "Companies Tracked",
             "value": f"{total_companies:,}",
-            "trend": 1.2,           # Placeholder — calculate from history in future
+            "trend": 1.2,  # Placeholder — calculate from history in future
             "trendLabel": "vs last week",
             "sparkline": companies_sparkline,
             "iconType": "Building",
@@ -85,7 +87,9 @@ def serialize_metric_cards(
         {
             "id": "m_funding",
             "label": "Funding Tracked Today",
-            "value": f"${funding_b}B" if funding_today >= 1e9 else f"${round(funding_today/1e6, 0):.0f}M",
+            "value": f"${funding_b}B"
+            if funding_today >= 1e9
+            else f"${round(funding_today / 1e6, 0):.0f}M",
             "trend": 0.0,
             "trendLabel": "vs 30d avg",
             "sparkline": funding_sparkline,
@@ -117,6 +121,7 @@ def serialize_metric_cards(
 # Matches: CompanyMetric[] (TypeScript)
 # ===========================================================================
 
+
 def serialize_company_metrics(
     companies: List[Any],
     sparklines: dict[str, List[float]],
@@ -134,17 +139,19 @@ def serialize_company_metrics(
         health = getattr(c, "business_health", 50.0)
         trend = "up" if health >= 70 else ("down" if health < 40 else "flat")
 
-        result.append({
-            "id": f"c_{name.lower().replace(' ', '_')}",
-            "name": name,
-            "momentum": round(getattr(c, "momentum_score", 0), 0),
-            "fundingTotal": getattr(c, "total_funding", 0),
-            "growthScore": round(getattr(c, "growth_score", 0), 0),
-            "riskScore": round(getattr(c, "risk_score", 0), 0),
-            "recommendation": getattr(c, "recommendation", "Monitor"),
-            "trendDirection": trend,
-            "sparklineData": sparklines.get(name, [50.0] * 5),
-        })
+        result.append(
+            {
+                "id": f"c_{name.lower().replace(' ', '_')}",
+                "name": name,
+                "momentum": round(getattr(c, "momentum_score", 0), 0),
+                "fundingTotal": getattr(c, "total_funding", 0),
+                "growthScore": round(getattr(c, "growth_score", 0), 0),
+                "riskScore": round(getattr(c, "risk_score", 0), 0),
+                "recommendation": getattr(c, "recommendation", "Monitor"),
+                "trendDirection": trend,
+                "sparklineData": sparklines.get(name, [50.0] * 5),
+            }
+        )
     return result
 
 
@@ -152,6 +159,7 @@ def serialize_company_metrics(
 # Market Snapshots (Area Chart)
 # Matches: MarketSnapshot[] (TypeScript)
 # ===========================================================================
+
 
 def serialize_market_snapshots(
     rows: List[dict[str, Any]],
@@ -177,6 +185,7 @@ def serialize_market_snapshots(
 # Matches: StrategicAlert[] (TypeScript)
 # ===========================================================================
 
+
 def serialize_strategic_alerts(
     rows: List[dict[str, Any]],
 ) -> List[dict[str, Any]]:
@@ -200,6 +209,7 @@ def serialize_strategic_alerts(
 # Timeline Events
 # Matches: TimelineEvent[] (TypeScript)
 # ===========================================================================
+
 
 def serialize_timeline_events(
     events: List[Any],
@@ -235,15 +245,17 @@ def serialize_timeline_events(
         else:
             importance = "Low"
 
-        result.append({
-            "id": f"te_{id(e)}",
-            "companyName": company,
-            "eventType": event_type,
-            "date": str(published) if published else _now_iso(),
-            "importance": importance,
-            "businessImpact": impact,
-            "aiSummary": summary,
-        })
+        result.append(
+            {
+                "id": f"te_{id(e)}",
+                "companyName": company,
+                "eventType": event_type,
+                "date": str(published) if published else _now_iso(),
+                "importance": importance,
+                "businessImpact": impact,
+                "aiSummary": summary,
+            }
+        )
     return result
 
 
@@ -251,6 +263,7 @@ def serialize_timeline_events(
 # AI Recommendations
 # Matches: Recommendation[] (TypeScript)
 # ===========================================================================
+
 
 def serialize_recommendations(
     rows: List[dict[str, Any]],

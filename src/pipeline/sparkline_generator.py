@@ -10,7 +10,6 @@ NOT raw historical data — this module performs the aggregation on the backend.
 
 from __future__ import annotations
 
-import statistics
 from typing import List
 
 from src.utils.logger import get_logger
@@ -59,8 +58,7 @@ class SparklineGenerator:
             return [50.0] * self.TARGET_POINTS
 
         normalized = [
-            round((v - min_val) / (max_val - min_val) * 100, 1)
-            for v in sampled
+            round((v - min_val) / (max_val - min_val) * 100, 1) for v in sampled
         ]
 
         return normalized

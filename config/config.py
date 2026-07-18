@@ -1,45 +1,52 @@
 from pathlib import Path
-import os
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
-# Load environment variables
-load_dotenv()
-
-
-class Config:
-    """Central configuration for the project."""
-
+class Settings(BaseSettings):
+    """Central configuration using Pydantic Settings."""
+    
     # Project
-    PROJECT_NAME = "Strategic Decision Intelligence Platform"
-    VERSION = "1.0.0"
+    PROJECT_NAME: str = "Strategic Decision Intelligence Platform"
+    VERSION: str = "1.0.0"
 
     # Environment
-    ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+    ENVIRONMENT: str = "development"
 
-    # Root directory
-    BASE_DIR = Path(__file__).resolve().parent.parent
-
-    # Data directories
-    DATA_DIR = BASE_DIR / "data"
-    RAW_DATA_DIR = DATA_DIR / "raw"
-    PROCESSED_DATA_DIR = DATA_DIR / "processed"
-    EXPORT_DIR = DATA_DIR / "exports"
-
-    # Documentation
-    DOCS_DIR = BASE_DIR / "docs"
+    # Root directory (resolved relative to this file)
+    BASE_DIR: Path = Path(__file__).resolve().parent.parent
 
     # Database
-    DATABASE_PATH = BASE_DIR / "startup_intelligence.db"
+    DATABASE_PATH: Path = BASE_DIR / "startup_intelligence.db"
+
+    # Data directories
+    DATA_DIR: Path = BASE_DIR / "data"
+    RAW_DATA_DIR: Path = DATA_DIR / "raw"
+    PROCESSED_DATA_DIR: Path = DATA_DIR / "processed"
+    EXPORT_DIR: Path = DATA_DIR / "exports"
+
+    # Documentation
+    DOCS_DIR: Path = BASE_DIR / "docs"
 
     # Logging
-    LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-    LOG_DIR = BASE_DIR / "logs"
-
-    # RSS Sources
-    GOOGLE_NEWS_RSS = (
-    "https://news.google.com/rss/search?q=Indian+startup&hl=en-IN&gl=IN&ceid=IN:en"
-)
-    
+    LOG_LEVEL: str = "INFO"
+    LOG_DIR: Path = BASE_DIR / "logs"
 
     # API Keys
-    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    OPENAI_API_KEY: str = ""
+    NEWS_API_KEY: str = ""
+
+    # CORS
+    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    
+    # RSS Sources
+    GOOGLE_NEWS_RSS: str = (
+        "https://news.google.com/rss/search?q=Indian+startup&hl=en-IN&gl=IN&ceid=IN:en"
+    )
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+
+Config = Settings()

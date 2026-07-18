@@ -5,7 +5,6 @@ Regex Patterns
 import re
 
 MONEY_PATTERN = re.compile(
-
     r"""
     (?:
         (\$|₹|USD|INR|Rs\.?|Rs)
@@ -28,13 +27,7 @@ MONEY_PATTERN = re.compile(
     )?
 
     """,
-
-    re.IGNORECASE | re.VERBOSE
-
+    re.IGNORECASE | re.VERBOSE,
 )
 
-PERCENT_PATTERN = re.compile(
-
-    r"(\d+(?:\.\d+)?)%"
-
-)
+PERCENT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)%")

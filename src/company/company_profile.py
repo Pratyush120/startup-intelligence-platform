@@ -7,7 +7,6 @@ from dataclasses import dataclass, field
 
 @dataclass
 class CompanyProfile:
-
     company_name: str
 
     funding_events: int = 0
@@ -39,29 +38,23 @@ class CompanyProfile:
         self.sources.add(event.source)
 
         if event.event_type == "Funding":
-
             self.funding_events += 1
 
             amount = event.entities.get("amount")
 
             if amount:
-
                 self.latest_funding = amount
 
         elif event.event_type == "Hiring":
-
             self.hiring_events += 1
 
         elif event.event_type == "Layoff":
-
             self.layoff_events += 1
 
         elif event.event_type == "Expansion":
-
             self.expansion_events += 1
 
         elif event.event_type == "Acquisition":
-
             self.acquisition_events += 1
 
     def calculate_momentum(self):

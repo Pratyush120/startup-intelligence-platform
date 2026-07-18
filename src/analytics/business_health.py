@@ -12,7 +12,6 @@ from dataclasses import dataclass
 
 @dataclass
 class HealthResult:
-
     score: int
 
     status: str
@@ -23,19 +22,12 @@ class HealthResult:
 
 
 class BusinessHealthEngine:
-
     WEIGHTS = {
-
         "Funding": 30,
-
         "Hiring": 20,
-
         "Expansion": 15,
-
         "Acquisition": 15,
-
-        "Layoff": -20
-
+        "Layoff": -20,
     }
 
     def calculate(self, company: dict):
@@ -121,37 +113,25 @@ class BusinessHealthEngine:
         # ---------------- Status ----------------
 
         if score >= 80:
-
             status = "Excellent"
 
             color = "green"
 
         elif score >= 60:
-
             status = "Healthy"
 
             color = "blue"
 
         elif score >= 40:
-
             status = "Watch"
 
             color = "orange"
 
         else:
-
             status = "At Risk"
 
             color = "red"
 
         return HealthResult(
-
-            score=score,
-
-            status=status,
-
-            color=color,
-
-            breakdown=breakdown
-
+            score=score, status=status, color=color, breakdown=breakdown
         )

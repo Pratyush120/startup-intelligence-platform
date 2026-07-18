@@ -22,9 +22,7 @@ class Database:
         Create a database connection.
         """
 
-        self.connection = sqlite3.connect(
-            Config.DATABASE_PATH
-        )
+        self.connection = sqlite3.connect(Config.DATABASE_PATH, check_same_thread=False)
 
         self.connection.execute("PRAGMA foreign_keys = ON")
 
@@ -92,7 +90,6 @@ class Database:
         """
 
         if self.connection:
-
             self.connection.close()
 
             logger.info("Database connection closed.")

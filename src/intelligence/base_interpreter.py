@@ -10,7 +10,6 @@ from src.models.events.business_event import BusinessEvent
 
 
 class BaseInterpreter(ABC):
-
     @abstractmethod
     def interpret(self, record) -> list[BusinessEvent]:
         """

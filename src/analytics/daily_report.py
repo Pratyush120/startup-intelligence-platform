@@ -4,7 +4,6 @@ Daily Intelligence Report
 
 
 class DailyReport:
-
     def generate(self, summary):
 
         report = []
@@ -17,9 +16,7 @@ class DailyReport:
 
         report.append("")
 
-        report.append(
-            f"Total Business Events : {summary['total_events']}"
-        )
+        report.append(f"Total Business Events : {summary['total_events']}")
 
         report.append("")
 
@@ -28,7 +25,6 @@ class DailyReport:
         report.append("----------------------------")
 
         for event, count in summary["event_breakdown"].items():
-
             report.append(f"{event:<20}{count}")
 
         report.append("")
@@ -38,17 +34,10 @@ class DailyReport:
         report.append("----------------------------")
 
         if summary["top_companies"]:
-
             for company, count in summary["top_companies"]:
-
-                report.append(
-
-                    f"{company:<25}{count}"
-
-                )
+                report.append(f"{company:<25}{count}")
 
         else:
-
             report.append("No company intelligence available.")
 
         report.append("")

@@ -15,11 +15,9 @@ import re
 
 
 class ArticleClassifier:
-
     def __init__(self):
 
         self.market_summary_patterns = [
-
             r"startup funding",
             r"indian startups",
             r"startup ecosystem",
@@ -37,71 +35,47 @@ class ArticleClassifier:
             r"funding landscape",
             r"funding activity",
             r"venture funding",
-            r"investment landscape"
-
+            r"investment landscape",
         ]
 
         self.company_event_patterns = [
-
             r"raises",
             r"raised",
             r"raise",
-
             r"secures",
             r"secured",
-
             r"bags",
             r"bagged",
-
             r"closes",
             r"closed",
-
             r"announces",
             r"announced",
-
             r"launches",
             r"launched",
-
             r"appoints",
             r"appointed",
-
             r"acquires",
             r"acquired",
-
             r"hires",
             r"hiring",
-
             r"opens",
-
             r"expands",
             r"expansion",
-
             r"invests",
             r"investment",
-
             r"fundraise",
-            r"fundraising"
-
+            r"fundraising",
         ]
 
         self.industry_patterns = [
-
             r"analysis",
-
             r"report",
-
             r"survey",
-
             r"research",
-
             r"forecast",
-
             r"market outlook",
-
             r"industry outlook",
-
-            r"industry report"
-
+            r"industry report",
         ]
 
     def classify(self, title: str) -> str:
@@ -113,9 +87,7 @@ class ArticleClassifier:
         # -----------------------------------
 
         for pattern in self.market_summary_patterns:
-
             if re.search(pattern, title):
-
                 return "Market Summary"
 
         # -----------------------------------
@@ -123,9 +95,7 @@ class ArticleClassifier:
         # -----------------------------------
 
         for pattern in self.company_event_patterns:
-
             if re.search(pattern, title):
-
                 return "Company Event"
 
         # -----------------------------------
@@ -133,9 +103,7 @@ class ArticleClassifier:
         # -----------------------------------
 
         for pattern in self.industry_patterns:
-
             if re.search(pattern, title):
-
                 return "Industry Report"
 
         # -----------------------------------

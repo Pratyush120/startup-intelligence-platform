@@ -17,9 +17,9 @@ from src.analytics.market_engine import MarketIntelligence
 # Trend Model
 # ==========================================================
 
+
 @dataclass
 class TrendReport:
-
     market_phase: str
 
     investment_outlook: str
@@ -45,16 +45,13 @@ class TrendReport:
 # Trend Engine
 # ==========================================================
 
-class TrendEngine:
 
+class TrendEngine:
     """
     Produces strategic trends from market intelligence.
     """
 
-    def analyse(
-        self,
-        market: MarketIntelligence
-    ) -> TrendReport:
+    def analyse(self, market: MarketIntelligence) -> TrendReport:
 
         opportunities = []
 
@@ -67,19 +64,15 @@ class TrendEngine:
         # --------------------------------------------
 
         if market.market_health >= 80:
-
             phase = "Expansion"
 
         elif market.market_health >= 60:
-
             phase = "Growth"
 
         elif market.market_health >= 40:
-
             phase = "Stable"
 
         else:
-
             phase = "Contraction"
 
         # --------------------------------------------
@@ -111,23 +104,18 @@ class TrendEngine:
         # --------------------------------------------
 
         if market.funding_share >= 50:
-
             emerging = "Funding-led ecosystem"
 
         elif market.hiring_share >= 25:
-
             emerging = "Hiring acceleration"
 
         elif market.expansion_share >= 20:
-
             emerging = "Rapid market expansion"
 
         elif market.layoff_share >= 20:
-
             emerging = "Operational restructuring"
 
         else:
-
             emerging = "Balanced ecosystem"
 
         # --------------------------------------------
@@ -135,119 +123,51 @@ class TrendEngine:
         # --------------------------------------------
 
         if market.market_health >= 75:
+            opportunities.append("Overall business environment is healthy.")
 
-            opportunities.append(
+        if market.investment_climate in ("Excellent", "Healthy"):
+            opportunities.append("Investment climate is favourable.")
 
-                "Overall business environment is healthy."
-
-            )
-
-        if market.investment_climate in (
-
-            "Excellent",
-
-            "Healthy"
-
-        ):
-
-            opportunities.append(
-
-                "Investment climate is favourable."
-
-            )
-
-        if market.growth_climate in (
-
-            "High Growth",
-
-            "Hyper Growth"
-
-        ):
-
-            opportunities.append(
-
-                "Growth momentum remains strong."
-
-            )
+        if market.growth_climate in ("High Growth", "Hyper Growth"):
+            opportunities.append("Growth momentum remains strong.")
 
         if market.market_concentration < 1500:
-
-            opportunities.append(
-
-                "Capital distribution is well diversified."
-
-            )
+            opportunities.append("Capital distribution is well diversified.")
 
         # --------------------------------------------
         # Risks
         # --------------------------------------------
 
         if market.risk_climate == "Critical":
-
-            risks.append(
-
-                "Market-wide operational risk is elevated."
-
-            )
+            risks.append("Market-wide operational risk is elevated.")
 
         if market.market_concentration >= 2500:
-
-            risks.append(
-
-                "Funding is concentrated in very few companies."
-
-            )
+            risks.append("Funding is concentrated in very few companies.")
 
         if market.layoff_share >= 15:
-
-            risks.append(
-
-                "Layoff activity is increasing."
-
-            )
+            risks.append("Layoff activity is increasing.")
 
         # --------------------------------------------
         # Observations
         # --------------------------------------------
 
         observations.append(
-
             f"Funding contributes {market.funding_share:.1f}% "
-
             f"of all detected business activity."
-
         )
 
         observations.append(
+            f"Average ecosystem health is {market.market_health:.1f}/100."
+        )
 
-            f"Average ecosystem health is "
+        observations.append(f"The strongest company is {market.top_company}.")
 
-            f"{market.market_health:.1f}/100."
-
+        observations.append(
+            f"The fastest growing company is {market.top_growth_company}."
         )
 
         observations.append(
-
-            f"The strongest company is "
-
-            f"{market.top_company}."
-
-        )
-
-        observations.append(
-
-            f"The fastest growing company is "
-
-            f"{market.top_growth_company}."
-
-        )
-
-        observations.append(
-
-            f"The dominant ecosystem activity is "
-
-            f"{market.dominant_activity.lower()}."
-
+            f"The dominant ecosystem activity is {market.dominant_activity.lower()}."
         )
 
         # --------------------------------------------
@@ -255,37 +175,21 @@ class TrendEngine:
         # --------------------------------------------
 
         summary = (
-
             f"The startup ecosystem is currently in a "
-
             f"{phase.lower()} phase with "
-
             f"{investment.lower()} investment conditions "
-
             f"and {growth.lower()} growth prospects."
-
         )
 
         return TrendReport(
-
             market_phase=phase,
-
             investment_outlook=investment,
-
             growth_outlook=growth,
-
             risk_outlook=risk,
-
             dominant_strategy=dominant,
-
             emerging_signal=emerging,
-
             market_summary=summary,
-
             opportunities=opportunities,
-
             risks=risks,
-
-            observations=observations
-
+            observations=observations,
         )

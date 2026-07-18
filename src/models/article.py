@@ -1,10 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 
 @dataclass
 class Article:
-
     title: str
 
     body: str

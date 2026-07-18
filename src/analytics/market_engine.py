@@ -12,7 +12,7 @@ This module contains no UI code.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List
 
 from src.analytics.company_engine import CompanyIntelligence
 
@@ -20,6 +20,7 @@ from src.analytics.company_engine import CompanyIntelligence
 # ==========================================================
 # Market Intelligence Model
 # ==========================================================
+
 
 @dataclass
 class MarketIntelligence:
@@ -103,6 +104,8 @@ class MarketIntelligence:
     # Intelligence
     # -----------------------------------------
 
+    market_health: float = 0.0
+
     market_sentiment: str = ""
 
     investment_climate: str = ""
@@ -128,15 +131,13 @@ class MarketIntelligence:
 # Market Engine
 # ==========================================================
 
+
 class MarketEngine:
     """
     Aggregates company intelligence into market intelligence.
     """
 
-    def build(
-        self,
-        companies: List[CompanyIntelligence]
-    ) -> MarketIntelligence:
+    def build(self, companies: List[CompanyIntelligence]) -> MarketIntelligence:
 
         market = MarketIntelligence()
 
@@ -145,28 +146,15 @@ class MarketEngine:
 
         market.total_companies = len(companies)
 
-        self._aggregate_metrics(
-            market,
-            companies
-        )
+        self._aggregate_metrics(market, companies)
 
-        self._calculate_market_shares(
-            market
-        )
+        self._calculate_market_shares(market)
 
-        self._identify_market_leaders(
-            market,
-            companies
-        )
+        self._identify_market_leaders(market, companies)
 
-        self._build_market_state(
-        market
-        )
+        self._build_market_state(market)
 
-        self._finalize(
-        market
-        )
-
+        # removed _finalize call
 
         return market
 
@@ -175,17 +163,13 @@ class MarketEngine:
     # ======================================================
 
     def _aggregate_metrics(
-        self,
-        market: MarketIntelligence,
-        companies: List[CompanyIntelligence]
+        self, market: MarketIntelligence, companies: List[CompanyIntelligence]
     ):
-
         """
         Aggregate raw metrics across all companies.
         """
 
         for company in companies:
-
             market.total_events += company.total_events
 
             market.total_funding += company.total_funding
@@ -222,14 +206,12 @@ class MarketEngine:
 
         market.average_confidence /= count
 
-            # ======================================================
+        # ======================================================
+
     # Market Share Calculation
     # ======================================================
 
-    def _calculate_market_shares(
-        self,
-        market: MarketIntelligence
-    ):
+    def _calculate_market_shares(self, market: MarketIntelligence):
         """
         Calculate percentage share of each business activity.
         """
@@ -245,35 +227,22 @@ class MarketEngine:
         if total == 0:
             return
 
-        market.funding_share = round(
-            market.funding_events * 100 / total, 2
-        )
+        market.funding_share = round(market.funding_events * 100 / total, 2)
 
-        market.hiring_share = round(
-            market.hiring_events * 100 / total, 2
-        )
+        market.hiring_share = round(market.hiring_events * 100 / total, 2)
 
-        market.expansion_share = round(
-            market.expansion_events * 100 / total, 2
-        )
+        market.expansion_share = round(market.expansion_events * 100 / total, 2)
 
-        market.layoff_share = round(
-            market.layoff_events * 100 / total, 2
-        )
+        market.layoff_share = round(market.layoff_events * 100 / total, 2)
 
-        market.acquisition_share = round(
-            market.acquisition_events * 100 / total, 2
-        )
-
+        market.acquisition_share = round(market.acquisition_events * 100 / total, 2)
 
     # ======================================================
     # Market Leaders
     # ======================================================
 
     def _identify_market_leaders(
-        self,
-        market: MarketIntelligence,
-        companies: List[CompanyIntelligence]
+        self, market: MarketIntelligence, companies: List[CompanyIntelligence]
     ):
         """
         Identify leaders across different business dimensions.
@@ -282,46 +251,35 @@ class MarketEngine:
         # --------------------------------------------------
 
         market.top_company = max(
-            companies,
-            key=lambda c: c.business_health
+            companies, key=lambda c: c.business_health
         ).company_name
 
         market.top_growth_company = max(
-            companies,
-            key=lambda c: c.growth_score
+            companies, key=lambda c: c.growth_score
         ).company_name
 
         market.highest_investment_company = max(
-            companies,
-            key=lambda c: c.investment_score
+            companies, key=lambda c: c.investment_score
         ).company_name
 
         market.highest_risk_company = max(
-            companies,
-            key=lambda c: c.risk_score
+            companies, key=lambda c: c.risk_score
         ).company_name
 
         market.most_influential_company = max(
-            companies,
-            key=lambda c: c.influence_score
+            companies, key=lambda c: c.influence_score
         ).company_name
 
         # --------------------------------------------------
 
-        self._calculate_market_concentration(
-            market,
-            companies
-        )
-
+        self._calculate_market_concentration(market, companies)
 
     # ======================================================
     # Market Concentration (HHI)
     # ======================================================
 
     def _calculate_market_concentration(
-        self,
-        market: MarketIntelligence,
-        companies: List[CompanyIntelligence]
+        self, market: MarketIntelligence, companies: List[CompanyIntelligence]
     ):
         """
         Computes an HHI-like concentration score using
@@ -333,13 +291,9 @@ class MarketEngine:
             >2500      Highly Concentrated
         """
 
-        total = sum(
-            c.total_funding
-            for c in companies
-        )
+        total = sum(c.total_funding for c in companies)
 
         if total == 0:
-
             market.market_concentration = 0
 
             return
@@ -347,139 +301,72 @@ class MarketEngine:
         hhi = 0
 
         for company in companies:
-
             share = company.total_funding / total
 
             hhi += (share * 100) ** 2
 
-        market.market_concentration = round(
-            hhi,
-            2
-        )
-
+        market.market_concentration = round(hhi, 2)
 
     # ======================================================
     # Dominant Market Activity
     # ======================================================
 
-    def _dominant_activity(
-        self,
-        market: MarketIntelligence
-    ):
+    def _dominant_activity(self, market: MarketIntelligence):
 
         values = {
-
             "Funding": market.funding_events,
-
             "Hiring": market.hiring_events,
-
             "Expansion": market.expansion_events,
-
             "Layoff": market.layoff_events,
-
-            "Acquisition": market.acquisition_events
-
+            "Acquisition": market.acquisition_events,
         }
 
-        market.dominant_activity = max(
-            values,
-            key=values.get
-        )
-
+        market.dominant_activity = max(values, key=values.get)
 
     # ======================================================
     # Funding Distribution
     # ======================================================
 
     def top_funding_companies(
-        self,
-        companies: List[CompanyIntelligence],
-        limit: int = 10
+        self, companies: List[CompanyIntelligence], limit: int = 10
     ):
         """
         Returns companies sorted by funding amount.
         """
 
-        return sorted(
-
-            companies,
-
-            key=lambda c: c.total_funding,
-
-            reverse=True
-
-        )[:limit]
-
+        return sorted(companies, key=lambda c: c.total_funding, reverse=True)[:limit]
 
     # ======================================================
     # Business Health Ranking
     # ======================================================
 
     def healthiest_companies(
-        self,
-        companies: List[CompanyIntelligence],
-        limit: int = 10
+        self, companies: List[CompanyIntelligence], limit: int = 10
     ):
 
-        return sorted(
-
-            companies,
-
-            key=lambda c: c.business_health,
-
-            reverse=True
-
-        )[:limit]
-
+        return sorted(companies, key=lambda c: c.business_health, reverse=True)[:limit]
 
     # ======================================================
     # Highest Growth Ranking
     # ======================================================
 
-    def fastest_growing(
-        self,
-        companies: List[CompanyIntelligence],
-        limit: int = 10
-    ):
+    def fastest_growing(self, companies: List[CompanyIntelligence], limit: int = 10):
 
-        return sorted(
-
-            companies,
-
-            key=lambda c: c.growth_score,
-
-            reverse=True
-
-        )[:limit]
-
+        return sorted(companies, key=lambda c: c.growth_score, reverse=True)[:limit]
 
     # ======================================================
     # Highest Risk Ranking
     # ======================================================
 
-    def highest_risk(
-        self,
-        companies: List[CompanyIntelligence],
-        limit: int = 10
-    ):
+    def highest_risk(self, companies: List[CompanyIntelligence], limit: int = 10):
 
-        return sorted(
-
-            companies,
-
-            key=lambda c: c.risk_score,
-
-            reverse=True
-
-        )[:limit]
+        return sorted(companies, key=lambda c: c.risk_score, reverse=True)[:limit]
         # ======================================================
+
     # Ecosystem Health Index
     # ======================================================
 
-    def _ecosystem_health_score(
-        self,
-        market: MarketIntelligence
-    ) -> float:
+    def _ecosystem_health_score(self, market: MarketIntelligence) -> float:
         """
         Computes an overall ecosystem health score (0-100).
 
@@ -499,22 +386,13 @@ class MarketEngine:
             + (100 - market.average_risk_score) * 0.10
         )
 
-        return round(
-
-            min(max(score, 0), 100),
-
-            2
-
-        )
+        return round(min(max(score, 0), 100), 2)
 
     # ======================================================
     # Market Sentiment
     # ======================================================
 
-    def _market_sentiment(
-        self,
-        score: float
-    ) -> str:
+    def _market_sentiment(self, score: float) -> str:
 
         if score >= 85:
             return "Very Positive"
@@ -534,10 +412,7 @@ class MarketEngine:
     # Investment Climate
     # ======================================================
 
-    def _investment_climate(
-        self,
-        market: MarketIntelligence
-    ) -> str:
+    def _investment_climate(self, market: MarketIntelligence) -> str:
 
         investment = market.average_investment_score
 
@@ -559,10 +434,7 @@ class MarketEngine:
     # Growth Climate
     # ======================================================
 
-    def _growth_climate(
-        self,
-        market: MarketIntelligence
-    ) -> str:
+    def _growth_climate(self, market: MarketIntelligence) -> str:
 
         growth = market.average_growth_score
 
@@ -584,10 +456,7 @@ class MarketEngine:
     # Risk Climate
     # ======================================================
 
-    def _risk_climate(
-        self,
-        market: MarketIntelligence
-    ) -> str:
+    def _risk_climate(self, market: MarketIntelligence) -> str:
 
         risk = market.average_risk_score
 
@@ -606,41 +475,20 @@ class MarketEngine:
     # Build Market Intelligence
     # ======================================================
 
-    def _build_market_state(
-        self,
-        market: MarketIntelligence
-    ):
+    def _build_market_state(self, market: MarketIntelligence):
         """
         Populate high-level market intelligence.
         """
 
-        ecosystem = self._ecosystem_health_score(
-            market
-        )
+        ecosystem = self._ecosystem_health_score(market)
 
-        market.market_sentiment = self._market_sentiment(
-            ecosystem
-        )
-        
-        market_health: float = 0.0
-        market.market_health = round(
-            ecosystem,
-            2
-        )
+        market.market_sentiment = self._market_sentiment(ecosystem)
+        market.market_health = round(ecosystem, 2)
 
-        market.investment_climate = self._investment_climate(
-            market
-        )
+        market.investment_climate = self._investment_climate(market)
 
-        market.growth_climate = self._growth_climate(
-            market
-        )
+        market.growth_climate = self._growth_climate(market)
 
-        market.risk_climate = self._risk_climate(
-            market
-        )
+        market.risk_climate = self._risk_climate(market)
 
-        self._dominant_activity(
-            market
-        )
-        
+        self._dominant_activity(market)

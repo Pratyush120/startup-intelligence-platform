@@ -87,43 +87,21 @@ class BusinessEvent:
     def to_dict(self):
 
         return {
-
             "event_type": self.event_type,
-
             "article_type": self.article_type,
-
             "company": self.company,
-
             "title": self.title,
-
             "source": self.source,
-
             "published_at": self.published_at,
-
             "confidence": self.confidence,
-
             "impact_score": self.impact_score,
-
             "entities": self.entities,
-
             "evidence": self.evidence,
-
             "reasoning": self.reasoning,
-
             "tags": self.tags,
-
             "metadata": self.metadata,
-
         }
 
     def __str__(self):
 
-        return (
-
-            f"{self.event_type}"
-
-            f" | {self.company}"
-
-            f" | {self.title}"
-
-        )
+        return f"{self.event_type} | {self.company} | {self.title}"

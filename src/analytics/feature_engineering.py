@@ -13,19 +13,21 @@ Pure business analytics.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from collections import Counter
 from typing import Dict, List
 
 from src.models.events.business_event import BusinessEvent
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 # ==========================================================
 # Feature Model
 # ==========================================================
 
+
 @dataclass
 class CompanyFeatures:
-
     company_name: str
 
     total_events: int = 0
@@ -67,8 +69,8 @@ class CompanyFeatures:
 # Feature Engineering Engine
 # ==========================================================
 
-class FeatureEngineeringEngine:
 
+class FeatureEngineeringEngine:
     """
     Converts BusinessEvents into company-level features.
     """
@@ -78,19 +80,13 @@ class FeatureEngineeringEngine:
         companies: Dict[str, CompanyFeatures] = {}
 
         for event in events:
-
             if not event.company:
                 continue
 
             company = event.company
 
             if company not in companies:
-
-                companies[company] = CompanyFeatures(
-
-                    company_name=company
-
-                )
+                companies[company] = CompanyFeatures(company_name=company)
 
             features = companies[company]
 
@@ -101,35 +97,26 @@ class FeatureEngineeringEngine:
             # ----------------------------------
 
             if event.event_type == "Funding":
-
                 features.funding_events += 1
 
                 amount = event.entities.get("amount")
 
                 if amount:
-
                     try:
-
                         features.total_funding += float(amount)
-
-                    except:
-
-                        pass
+                    except Exception as e:
+                        logger.warning(f"Could not parse funding amount {amount}: {e}")
 
             elif event.event_type == "Hiring":
-
                 features.hiring_events += 1
 
             elif event.event_type == "Layoff":
-
                 features.layoff_events += 1
 
             elif event.event_type == "Expansion":
-
                 features.expansion_events += 1
 
             elif event.event_type == "Acquisition":
-
                 features.acquisition_events += 1
 
             # ----------------------------------
@@ -153,49 +140,25 @@ class FeatureEngineeringEngine:
             # ----------------------------------
 
             features.event_counter[event.event_type] = (
-
-                features.event_counter.get(
-
-                    event.event_type,
-
-                    0
-
-                )
-
-                + 1
-
+                features.event_counter.get(event.event_type, 0) + 1
             )
 
         # =====================================================
 
         for feature in companies.values():
-
             if feature.total_events:
-
                 feature.average_confidence /= feature.total_events
 
                 feature.average_impact /= feature.total_events
 
-            feature.source_diversity = len(
+            feature.source_diversity = len(set(feature.sources))
 
-                set(feature.sources)
-
-            )
-
-            feature.event_diversity = len(
-
-                feature.event_counter
-
-            )
+            feature.event_diversity = len(feature.event_counter)
 
             feature.momentum = (
-
                 feature.total_events
-
                 * feature.average_confidence
-
                 * (1 + feature.event_diversity * 0.10)
-
             )
 
         return companies

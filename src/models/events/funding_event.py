@@ -4,7 +4,6 @@ from typing import Optional
 
 @dataclass
 class FundingEvent:
-
     company: Optional[str]
 
     amount: Optional[float]

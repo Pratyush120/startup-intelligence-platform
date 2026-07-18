@@ -7,11 +7,14 @@ Responsibilities:
   - Strip HTML entities
   - Normalize Unicode
   - Filter non-English articles
+  - Duplicate whitespace cleanup
+  - Metadata normalization
   - Truncate to safe length
 """
 
 import re
 import html
+import unicodedata
 from typing import List
 
 from src.models.record import Record
@@ -24,7 +27,6 @@ _ASCII_THRESHOLD = 0.75  # If < 75% ASCII chars, skip as non-English
 
 
 class Preprocessor:
-
     MAX_DESCRIPTION_LEN = 512
 
     def process(self, records: List[Record]) -> List[Record]:
@@ -42,9 +44,7 @@ class Preprocessor:
             else:
                 skipped += 1
 
-        logger.info(
-            f"Preprocessor: {len(cleaned)} clean, {skipped} skipped."
-        )
+        logger.info(f"Preprocessor: {len(cleaned)} clean, {skipped} skipped.")
         return cleaned
 
     def _process_one(self, record: Record) -> Record | None:
@@ -57,9 +57,16 @@ class Preprocessor:
         if not self._is_likely_english(title):
             return None
 
-        # Return a new Record with cleaned fields (Records are dataclasses)
+        # Return a new Record with cleaned fields
         record.title = title
-        record.description = description[:self.MAX_DESCRIPTION_LEN]
+        record.description = description[: self.MAX_DESCRIPTION_LEN]
+
+        # Metadata normalization
+        if not record.metadata:
+            record.metadata = {}
+        publisher = record.metadata.get("publisher", "Unknown")
+        record.metadata["publisher"] = self._clean_text(str(publisher))
+
         return record
 
     # ------------------------------------------------------------------
@@ -68,16 +75,19 @@ class Preprocessor:
 
     def _clean_text(self, text: str) -> str:
         """
-        Strips HTML tags, decodes HTML entities, normalizes whitespace.
+        Strips HTML tags, decodes HTML entities, normalizes unicode and whitespace.
         """
         if not text:
             return ""
 
-        # Decode HTML entities (&amp; → &, &#39; → ')
+        # Decode HTML entities (&amp; -> &, &#39; -> ')
         text = html.unescape(text)
 
         # Remove HTML/XML tags
         text = re.sub(r"<[^>]+>", " ", text)
+
+        # Normalize Unicode (NFKC)
+        text = unicodedata.normalize("NFKC", text)
 
         # Collapse multiple spaces/newlines
         text = re.sub(r"\s+", " ", text).strip()
@@ -85,7 +95,7 @@ class Preprocessor:
         return text
 
     # ------------------------------------------------------------------
-    # Language Detection (lightweight heuristic — no extra dependency)
+    # Language Detection (lightweight heuristic)
     # ------------------------------------------------------------------
 
     def _is_likely_english(self, text: str) -> bool:

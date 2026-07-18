@@ -22,7 +22,6 @@ class MockRecord:
 
 
 class TestUrlHash(unittest.TestCase):
-
     def test_deterministic(self):
         h1 = url_hash("https://example.com/article")
         h2 = url_hash("https://example.com/article")
@@ -35,27 +34,24 @@ class TestUrlHash(unittest.TestCase):
 
 
 class TestTitleSimilarity(unittest.TestCase):
-
     def test_identical_titles(self):
         self.assertAlmostEqual(title_similarity("Hello World", "Hello World"), 1.0)
 
     def test_similar_titles(self):
         score = title_similarity(
             "OpenAI raises $6.6 billion in new funding",
-            "OpenAI raises $6.6B in new funding round"
+            "OpenAI raises $6.6B in new funding round",
         )
         self.assertGreater(score, 0.8)
 
     def test_different_titles(self):
         score = title_similarity(
-            "Tesla announces new factory",
-            "Apple launches iPhone 20"
+            "Tesla announces new factory", "Apple launches iPhone 20"
         )
         self.assertLess(score, 0.5)
 
 
 class TestDeduplicator(unittest.TestCase):
-
     def test_removes_exact_url_duplicates(self):
         records = [
             MockRecord(title="Article 1", url="https://example.com/1"),
@@ -67,8 +63,12 @@ class TestDeduplicator(unittest.TestCase):
 
     def test_removes_similar_titles(self):
         records = [
-            MockRecord(title="OpenAI raises $6.6 billion in new funding", url="https://a.com"),
-            MockRecord(title="OpenAI raises $6.6B in new funding round", url="https://b.com"),
+            MockRecord(
+                title="OpenAI raises $6.6 billion in new funding", url="https://a.com"
+            ),
+            MockRecord(
+                title="OpenAI raises $6.6B in new funding round", url="https://b.com"
+            ),
         ]
         dedup = Deduplicator()
         result = dedup.deduplicate(records)

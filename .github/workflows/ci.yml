@@ -1,4 +1,4 @@
-name: CI Pipeline
+name: CI
 
 on:
   push:
@@ -7,64 +7,59 @@ on:
     branches: [ "main" ]
 
 jobs:
-  frontend:
-    name: Frontend Build & Lint
+  test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-
     steps:
     - uses: actions/checkout@v4
     
-    - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18.x'
-        cache: 'npm'
-        cache-dependency-path: './frontend/package-lock.json'
-        
-    - name: Install dependencies
-      run: npm ci
-      
-    - name: Lint
-      run: npm run lint
-      
-    - name: Type Check (tsc)
-      run: npx tsc --noEmit
-      
-    - name: Build
-      run: npm run build
-
-  backend:
-    name: Backend Pytest
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
-
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
+    - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
-        cache: 'pip'
+        python-version: "3.11"
+        cache: "pip"
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pytest pytest-cov
+        pip install ruff pytest pytest-asyncio pytest-cov httpx structlog
         
-    - name: Run Pytest
+    - name: Lint with Ruff
       run: |
-        pytest --cov=app --cov-report=xml
+        ruff check .
+        ruff format --check .
         
-    - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+    - name: Test with pytest
+      run: |
+        pytest tests/ --cov=src --cov-report=xml
+        
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
       with:
-        file: ./backend/coverage.xml
-        flags: unittests
-        name: codecov-umbrella
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20.x"
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+    - name: Install frontend dependencies
+      working-directory: ./frontend
+      run: npm ci
+    - name: Build frontend
+      working-directory: ./frontend
+      run: npm run build
+      env:
+        NEXT_TELEMETRY_DISABLED: 1
+
+  build-backend-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build backend Docker image
+      run: docker build -t sdip-backend .

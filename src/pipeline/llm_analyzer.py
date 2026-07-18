@@ -2,177 +2,115 @@
 LLM Analyzer
 
 Generates AI-powered strategic summaries and confidence scores.
-
-Design:
-  - Primary:  OpenAI GPT-4o-mini or Google Gemini
-  - Fallback: Rule-based summarizer (no API key required)
-  - Cache:    In-memory dict keyed by title hash to avoid re-analysis
-  - Budget:   MAX_LLM_CALLS_PER_RUN caps API spend
 """
 
 from __future__ import annotations
 
+import time
 import hashlib
 import os
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Dict, Optional
 
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-MAX_LLM_CALLS_PER_RUN = int(os.getenv("MAX_LLM_CALLS", "100"))
-
 
 @dataclass
 class LLMAnalysis:
-    ai_summary: str = ""
+    executive_summary: str = ""
     business_impact: str = ""
+    strategic_recommendation: str = ""
+    risk: str = ""
+    opportunity: str = ""
+    key_insight: str = ""
     confidence: float = 0.75
-    risk_tags: List[str] = field(default_factory=list)
-    opportunity_tags: List[str] = field(default_factory=list)
+    prompt_version: str = "v1"
+    token_usage: int = 0
+    processing_time_ms: int = 0
 
 
-_IMPACT_TEMPLATES: dict[str, str] = {
-    "Funding": "Signals investor confidence and accelerates growth runway.",
-    "Acquisition": "Consolidates market position and expands product capabilities.",
-    "Hiring": "Indicates business expansion and operational scaling.",
-    "Layoff": "Raises operational risk and may signal financial stress.",
-    "IPO": "Creates liquidity event and increases public market scrutiny.",
-    "Product Launch": "Expands addressable market and increases competitive pressure.",
-    "Partnership": "Strengthens ecosystem ties and opens new distribution channels.",
-    "Expansion": "Demonstrates geographic or vertical growth ambition.",
-    "Litigation": "Introduces regulatory and financial risk to the business.",
-    "Leadership": "Signals strategic direction change at the executive level.",
-    "General": "Represents a notable development in the company trajectory.",
-}
-
-_RISK_TAGS: dict[str, List[str]] = {
-    "Layoff": ["workforce_reduction", "financial_stress"],
-    "Litigation": ["regulatory_risk", "legal_exposure"],
-    "Acquisition": ["integration_risk"],
-}
-
-_OPPORTUNITY_TAGS: dict[str, List[str]] = {
-    "Funding": ["growth_capital", "expansion_ready"],
-    "Acquisition": ["market_consolidation", "capability_expansion"],
-    "IPO": ["liquidity_event", "public_market_access"],
-    "Partnership": ["distribution_growth", "ecosystem_expansion"],
-    "Product Launch": ["market_expansion", "competitive_differentiation"],
-    "Hiring": ["scale_signal"],
-    "Expansion": ["geographic_growth"],
-}
+class LLMProvider(ABC):
+    @abstractmethod
+    def analyze(
+        self, title: str, description: str, event_type: str, company: str
+    ) -> LLMAnalysis:
+        pass
 
 
-def _rule_based_analysis(title: str, event_type: str, company: str) -> LLMAnalysis:
-    impact = _IMPACT_TEMPLATES.get(event_type, _IMPACT_TEMPLATES["General"])
-    summary = f"{company}: {title.strip().rstrip('.')}. {impact}"
-    return LLMAnalysis(
-        ai_summary=summary[:300],
-        business_impact=impact,
-        confidence=0.70,
-        risk_tags=_RISK_TAGS.get(event_type, []),
-        opportunity_tags=_OPPORTUNITY_TAGS.get(event_type, []),
-    )
+class MockProvider(LLMProvider):
+    def analyze(
+        self, title: str, description: str, event_type: str, company: str
+    ) -> LLMAnalysis:
+        start = time.time()
+        # Simulate slight delay
+        time.sleep(0.01)
+        return LLMAnalysis(
+            executive_summary=f"Mock summary for {company}: {title}",
+            business_impact=f"Moderate impact on {company}'s market positioning.",
+            strategic_recommendation="Monitor competitors and evaluate strategic alternatives.",
+            risk="Execution risks in changing macroeconomic climate.",
+            opportunity="Potential for market expansion.",
+            key_insight="Strategic positioning remains vital.",
+            confidence=0.85,
+            prompt_version="mock_v1",
+            token_usage=42,
+            processing_time_ms=int((time.time() - start) * 1000),
+        )
 
 
-class LLMAnalyzer:
-
+class OpenAIProvider(LLMProvider):
     def __init__(self):
-        self._openai_key = os.getenv("OPENAI_API_KEY")
-        self._gemini_key = os.getenv("GOOGLE_API_KEY")
-        self._cache: Dict[str, LLMAnalysis] = {}
-        self._call_count = 0
+        self._api_key = os.getenv("OPENAI_API_KEY")
+        if not self._api_key:
+            raise ValueError("OPENAI_API_KEY environment variable is not set")
 
-        if self._openai_key:
-            logger.info("LLMAnalyzer: OpenAI mode enabled.")
-        elif self._gemini_key:
-            logger.info("LLMAnalyzer: Gemini mode enabled.")
-        else:
-            logger.warning("LLMAnalyzer: No API key. Rule-based fallback.")
+        try:
+            from openai import OpenAI
+
+            self.client = OpenAI(api_key=self._api_key)
+        except ImportError:
+            raise ImportError("openai package is required for OpenAIProvider")
 
     def analyze(
-        self,
-        title: str,
-        description: str,
-        event_type: str,
-        company: str,
+        self, title: str, description: str, event_type: str, company: str
     ) -> LLMAnalysis:
-        # Cache check
-        cache_key = hashlib.md5(f"{title}:{event_type}".encode()).hexdigest()
-        if cache_key in self._cache:
-            return self._cache[cache_key]
+        start = time.time()
+        safe_title = title[:200].replace("\n", " ")
+        safe_desc = description[:400].replace("\n", " ")
 
-        # Budget check
-        if self._call_count >= MAX_LLM_CALLS_PER_RUN:
-            logger.info(f"LLM budget exhausted ({MAX_LLM_CALLS_PER_RUN}). Using fallback.")
-            result = _rule_based_analysis(title, event_type, company)
-            self._cache[cache_key] = result
-            return result
-
-        # Try LLM providers
-        if self._openai_key:
-            try:
-                result = self._openai_analyze(title, description, event_type, company)
-                self._call_count += 1
-                self._cache[cache_key] = result
-                return result
-            except Exception as e:
-                logger.warning(f"OpenAI call failed: {e}. Using fallback.")
-
-        if self._gemini_key:
-            try:
-                result = self._gemini_analyze(title, description, event_type, company)
-                self._call_count += 1
-                self._cache[cache_key] = result
-                return result
-            except Exception as e:
-                logger.warning(f"Gemini call failed: {e}. Using fallback.")
-
-        result = _rule_based_analysis(title, event_type, company)
-        self._cache[cache_key] = result
-        return result
-
-    def _openai_analyze(self, title: str, description: str, event_type: str, company: str) -> LLMAnalysis:
-        from openai import OpenAI  # type: ignore
-        client = OpenAI(api_key=self._openai_key)
-        prompt = self._build_prompt(title, description, event_type, company)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            max_tokens=300,
-        )
-        return self._parse_response(response.choices[0].message.content or "", event_type)
-
-    def _gemini_analyze(self, title: str, description: str, event_type: str, company: str) -> LLMAnalysis:
-        import google.generativeai as genai  # type: ignore
-        genai.configure(api_key=self._gemini_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        prompt = self._build_prompt(title, description, event_type, company)
-        response = model.generate_content(prompt)
-        return self._parse_response(response.text or "", event_type)
-
-    def _build_prompt(self, title: str, description: str, event_type: str, company: str) -> str:
-        # Sanitize inputs to prevent prompt injection
-        safe_title = title[:200].replace('\n', ' ')
-        safe_desc = description[:400].replace('\n', ' ')
-        return f"""You are a senior investment analyst. Analyze this startup news event.
+        prompt = f"""You are a senior investment analyst. Analyze this startup news event.
 
 Company: {company}
 Event Type: {event_type}
 Headline: {safe_title}
 Details: {safe_desc}
 
-Respond in this exact format (no markdown):
-SUMMARY: [1-2 sentence executive summary, max 200 chars]
+Respond in this exact format (no markdown, one line per field):
+SUMMARY: [1-2 sentence executive summary]
 IMPACT: [1 sentence business impact]
-CONFIDENCE: [0.0-1.0 float]
-RISK_TAGS: [comma-separated tags]
-OPPORTUNITY_TAGS: [comma-separated tags]"""
+RECOMMENDATION: [1 sentence strategic recommendation]
+RISK: [1 sentence identifying key risk]
+OPPORTUNITY: [1 sentence identifying key opportunity]
+INSIGHT: [1 sentence key insight]
+CONFIDENCE: [0.0-1.0 float]"""
 
-    def _parse_response(self, text: str, event_type: str) -> LLMAnalysis:
-        lines: dict[str, str] = {}
+        try:
+            response = self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3,
+                max_tokens=300,
+            )
+            text = response.choices[0].message.content or ""
+            tokens = response.usage.total_tokens if response.usage else 0
+        except Exception as e:
+            logger.error(f"OpenAI API error: {e}")
+            raise
+
+        lines = {}
         for line in text.strip().split("\n"):
             if ":" in line:
                 key, _, val = line.partition(":")
@@ -184,15 +122,57 @@ OPPORTUNITY_TAGS: [comma-separated tags]"""
         except ValueError:
             confidence = 0.75
 
-        def parse_tags(raw: str) -> List[str]:
-            if not raw:
-                return []
-            return [t.strip() for t in raw.split(",") if t.strip()]
-
         return LLMAnalysis(
-            ai_summary=lines.get("SUMMARY", "")[:300],
-            business_impact=lines.get("IMPACT", ""),
+            executive_summary=lines.get("SUMMARY", "")[:300],
+            business_impact=lines.get("IMPACT", "")[:200],
+            strategic_recommendation=lines.get("RECOMMENDATION", "")[:200],
+            risk=lines.get("RISK", "")[:200],
+            opportunity=lines.get("OPPORTUNITY", "")[:200],
+            key_insight=lines.get("INSIGHT", "")[:200],
             confidence=confidence,
-            risk_tags=parse_tags(lines.get("RISK_TAGS", "")),
-            opportunity_tags=parse_tags(lines.get("OPPORTUNITY_TAGS", "")),
+            prompt_version="v1",
+            token_usage=tokens,
+            processing_time_ms=int((time.time() - start) * 1000),
         )
+
+
+class LLMAnalyzer:
+    def __init__(self, provider: Optional[LLMProvider] = None):
+        if provider is None:
+            if os.getenv("OPENAI_API_KEY"):
+                try:
+                    self.provider = OpenAIProvider()
+                    logger.info("LLMAnalyzer: Initialized with OpenAIProvider")
+                except Exception as e:
+                    logger.warning(
+                        f"Failed to init OpenAIProvider: {e}. Falling back to MockProvider"
+                    )
+                    self.provider = MockProvider()
+            else:
+                self.provider = MockProvider()
+                logger.info(
+                    "LLMAnalyzer: Initialized with MockProvider (No API key found)"
+                )
+        else:
+            self.provider = provider
+
+        self._cache: Dict[str, LLMAnalysis] = {}
+
+    def analyze(
+        self, title: str, description: str, event_type: str, company: str
+    ) -> LLMAnalysis:
+        cache_key = hashlib.md5(f"{title}:{event_type}".encode()).hexdigest()
+        if cache_key in self._cache:
+            return self._cache[cache_key]
+
+        try:
+            result = self.provider.analyze(title, description, event_type, company)
+            self._cache[cache_key] = result
+            return result
+        except Exception as e:
+            logger.error(f"LLM Provider {self.provider.__class__.__name__} failed: {e}")
+            # Fallback to mock on failure
+            mock = MockProvider()
+            result = mock.analyze(title, description, event_type, company)
+            self._cache[cache_key] = result
+            return result

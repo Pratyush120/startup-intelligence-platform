@@ -11,45 +11,78 @@ from src.company.company_resolver import CompanyResolver
 
 
 class CompanyExtractor:
-
     def __init__(self):
 
         self.resolver = CompanyResolver()
 
         self.stopwords = {
-
             # Months
-            "January","February","March","April","May","June","July",
-            "August","September","October","November","December",
-
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
             # News Words
-            "The","These","This","That","How","Why","What",
-            "Between","After","Before","During","Against","Over",
-
+            "The",
+            "These",
+            "This",
+            "That",
+            "How",
+            "Why",
+            "What",
+            "Between",
+            "After",
+            "Before",
+            "During",
+            "Against",
+            "Over",
             # Startup Words
-            "Startup","Startups","Indian","India",
-
-            "Funding","Fund","Fundraise","Fundraising",
-            "Investment","Investments",
-            "Investor","Investors",
-
-            "Raise","Raises","Raised",
-
-            "Series","Bridge","Round",
-
-            "Technology","Technologies",
+            "Startup",
+            "Startups",
+            "Indian",
+            "India",
+            "Funding",
+            "Fund",
+            "Fundraise",
+            "Fundraising",
+            "Investment",
+            "Investments",
+            "Investor",
+            "Investors",
+            "Raise",
+            "Raises",
+            "Raised",
+            "Series",
+            "Bridge",
+            "Round",
+            "Technology",
+            "Technologies",
             "Platform",
             "Assistant",
             "Business",
             "Commerce",
             "Infrastructure",
-
-            "AI","ML",
-
+            "AI",
+            "ML",
             # Money
-            "Million","Billion","Mn","M","Cr","Crore",
-            "Lakh","Lakhs","USD","INR","Rs"
-
+            "Million",
+            "Billion",
+            "Mn",
+            "M",
+            "Cr",
+            "Crore",
+            "Lakh",
+            "Lakhs",
+            "USD",
+            "INR",
+            "Rs",
         }
 
     def clean_token(self, token):
@@ -66,23 +99,11 @@ class CompanyExtractor:
 
     def tokenize(self, title):
 
-        return re.findall(
-
-            r"[A-Z][A-Za-z0-9&.'-]*",
-
-            title
-
-        )
+        return re.findall(r"[A-Z][A-Za-z0-9&.'-]*", title)
 
     def extract(self, title):
 
-        tokens = [
-
-            self.clean_token(t)
-
-            for t in self.tokenize(title)
-
-        ]
+        tokens = [self.clean_token(t) for t in self.tokenize(title)]
 
         # -----------------------------
         # STEP 1
@@ -92,9 +113,7 @@ class CompanyExtractor:
         title_lower = title.lower()
 
         for company in KNOWN_COMPANIES:
-
             if company.lower() in title_lower:
-
                 return company
 
         # -----------------------------
@@ -105,7 +124,6 @@ class CompanyExtractor:
         candidates = []
 
         for token in tokens:
-
             if len(token) < 2:
                 continue
 
@@ -126,13 +144,9 @@ class CompanyExtractor:
         # -----------------------------
 
         for candidate in candidates:
-
             resolved = self.resolver.resolve(candidate)
 
-            if resolved is not None :
-
+            if resolved is not None:
                 return resolved
-
-
 
         return None

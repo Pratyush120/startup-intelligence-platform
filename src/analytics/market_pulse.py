@@ -10,7 +10,6 @@ from dataclasses import dataclass
 
 @dataclass
 class PulseResult:
-
     funding: str
     hiring: str
     layoffs: str
@@ -21,13 +20,11 @@ class PulseResult:
 
 
 class MarketPulseEngine:
-
     def calculate(self, events):
 
         counts = Counter()
 
         for event in events:
-
             counts[event.event_type] += 1
 
         def classify(count):
@@ -46,26 +43,14 @@ class MarketPulseEngine:
         dominant = "None"
 
         if counts:
-
-            dominant = max(
-                counts,
-                key=counts.get
-            )
+            dominant = max(counts, key=counts.get)
 
         return PulseResult(
-
             funding=classify(counts["Funding"]),
-
             hiring=classify(counts["Hiring"]),
-
             layoffs=classify(counts["Layoff"]),
-
             expansion=classify(counts["Expansion"]),
-
             acquisitions=classify(counts["Acquisition"]),
-
             dominant_event=dominant,
-
-            total_events=sum(counts.values())
-
+            total_events=sum(counts.values()),
         )

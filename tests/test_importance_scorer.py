@@ -2,54 +2,67 @@
 Tests for ImportanceScorer
 """
 
-import unittest
 from datetime import datetime, timezone, timedelta
-
 from src.pipeline.importance_scorer import ImportanceScorer
+from src.models.record import Record
 
 
-class TestImportanceScorer(unittest.TestCase):
-
-    def setUp(self):
+class TestImportanceScorer:
+    def setup_method(self):
         self.scorer = ImportanceScorer()
 
-    def test_returns_float_in_range(self):
-        score = self.scorer.score(source="Google News", event_type="Funding")
-        self.assertIsInstance(score, float)
-        self.assertGreaterEqual(score, 0.0)
-        self.assertLessEqual(score, 10.0)
+    def _make_record(
+        self, source, publisher, event_type, published_at=None, confidence=0.8
+    ):
+        if not published_at:
+            published_at = datetime.now(timezone.utc).isoformat()
+        return Record(
+            source=source,
+            title="Test",
+            description="",
+            url="url",
+            published_at=published_at,
+            collected_at="",
+            record_type="news",
+            metadata={
+                "publisher": publisher,
+                "category": event_type,
+                "confidence": confidence,
+            },
+        )
 
-    def test_techcrunch_scores_higher_than_unknown(self):
-        tc = self.scorer.score(publisher="TechCrunch", event_type="Funding")
-        unknown = self.scorer.score(publisher="Random Blog", event_type="Funding")
-        self.assertGreater(tc, unknown)
+    def test_high_authority_source(self):
+        record = self._make_record("Bloomberg", "Bloomberg", "IPO")
+        score = self.scorer.score(record)
+        assert score > 80.0
 
-    def test_acquisition_scores_higher_than_hiring(self):
-        acq = self.scorer.score(event_type="Acquisition")
-        hire = self.scorer.score(event_type="Hiring")
-        self.assertGreater(acq, hire)
+    def test_low_authority_source(self):
+        record = self._make_record("Unknown Blog", "Unknown", "General")
+        score = self.scorer.score(record)
+        assert score < 60.0
 
-    def test_ipo_is_highest_weight(self):
-        ipo = self.scorer.score(event_type="IPO")
-        funding = self.scorer.score(event_type="Funding")
-        self.assertGreater(ipo, funding)
+    def test_event_weights(self):
+        r1 = self._make_record("TechCrunch", "TechCrunch", "Funding")
+        r2 = self._make_record("TechCrunch", "TechCrunch", "General")
+        score1 = self.scorer.score(r1)
+        score2 = self.scorer.score(r2)
+        assert score1 > score2
 
-    def test_recent_article_scores_higher(self):
-        now = datetime.now(timezone.utc).isoformat()
-        old = (datetime.now(timezone.utc) - timedelta(days=14)).isoformat()
-        recent = self.scorer.score(published_at=now, event_type="Funding")
-        stale = self.scorer.score(published_at=old, event_type="Funding")
-        self.assertGreater(recent, stale)
+    def test_recency_decay(self):
+        now = datetime.now(timezone.utc)
+        old_date = (now - timedelta(days=14)).isoformat()
+        r_new = self._make_record(
+            "TechCrunch", "TechCrunch", "Funding", now.isoformat()
+        )
+        r_old = self._make_record("TechCrunch", "TechCrunch", "Funding", old_date)
 
-    def test_no_published_at_returns_neutral(self):
-        score = self.scorer.score(event_type="General")
-        self.assertGreater(score, 0.0)
+        score_new = self.scorer.score(r_new)
+        score_old = self.scorer.score(r_old)
+        assert score_new > score_old
 
-    def test_bloomberg_is_max_authority(self):
-        bloom = self.scorer.score(publisher="Bloomberg", event_type="General")
-        generic = self.scorer.score(publisher="Unknown", event_type="General")
-        self.assertGreater(bloom, generic)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_invalid_date_graceful_handling(self):
+        record = self._make_record(
+            "TechCrunch", "TechCrunch", "Funding", "invalid-date-format"
+        )
+        score = self.scorer.score(record)
+        assert isinstance(score, float)
