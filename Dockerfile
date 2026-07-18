@@ -37,12 +37,15 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 COPY requirements.txt requirements.txt
 COPY requirements/ requirements/
 
-# Build all wheels. BuildKit pip cache persists across builds.
+# Build all wheels (including transitives) into /build/wheels.
+# NOTE: --no-deps is intentionally REMOVED so pip resolves the full dependency
+# closure and builds every transitive wheel. The runtime stage uses --no-index,
+# so every required wheel must be present in /build/wheels.
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip wheel \
-        --no-deps \
         --wheel-dir /build/wheels \
         -r requirements/prod.txt
+
 
 
 # ── Stage 2: Production runtime ───────────────────────────────────────────────

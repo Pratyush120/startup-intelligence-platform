@@ -1,10 +1,13 @@
 # =============================================================================
 # requirements/prod.txt
 #
-# Production dependencies = base + pinned transitive deps.
+# COMPLETE production dependency closure for Docker --no-index wheel install.
 #
-# Transitive packages are pinned here (==) to guarantee byte-for-byte
-# reproducible Docker builds across CI, Render, and local installs.
+# Every package listed here requires a pre-built wheel in /wheels/.
+# If a package is missing here, the offline `pip install --no-index` step
+# in the Docker runtime stage will fail with "No matching distribution found".
+#
+# Rule: ALL direct deps + ALL transitives must be listed here explicitly.
 #
 # Regenerate with:
 #   pip-compile requirements/prod.in --output-file requirements/prod.txt
@@ -12,38 +15,48 @@
 
 -r base.txt
 
-# ── Pinned Transitives ────────────────────────────────────────────────────────
-# These are resolved by pip automatically from the above, but pinning them
-# here ensures 100% deterministic builds with no resolver surprises.
+# ── starlette (fastapi's WSGI core — required by fastapi, was missing) ────────
+starlette==0.46.2
 
-# requests transitive chain
+# ── click (uvicorn CLI entrypoint dependency) ─────────────────────────────────
+click==8.1.9
+
+# ── httpcore (httpx transport layer) ─────────────────────────────────────────
+httpcore==1.0.9
+
+# ── annotated-types (pydantic v2 type annotation support) ────────────────────
+annotated-types==0.7.0
+
+# ── typing-inspection (pydantic v2 runtime introspection) ────────────────────
+typing-inspection==0.4.2
+
+# ── Pinned requests transitive chain ─────────────────────────────────────────
 certifi==2025.4.26
 charset-normalizer==3.4.2
 idna==3.10
 urllib3==2.4.0
 
-# pandas transitive chain
+# ── Pinned pandas transitive chain ────────────────────────────────────────────
 python-dateutil==2.9.0.post0
 pytz==2025.2
 tzdata==2025.2
-six==1.17.0                      # python-dateutil dependency
+six==1.17.0
 
-# uvicorn[standard] extras
+# ── Pinned uvicorn[standard] extras ───────────────────────────────────────────
 h11==0.16.0
 httptools==0.6.4
 websockets==15.0.1
 watchfiles==1.0.5
 python-multipart==0.0.20
 
-# openai transitive chain
-httpx>=0.28.0,<1.0               # openai uses httpx as HTTP client
-anyio>=4.9,<5                    # async primitives
-sniffio>=1.1                     # anyio backend detection
-distro>=1.7.0,<2                 # openai system info
-jiter>=0.10.0                    # openai fast JSON parsing
-typing-extensions>=4.10,<5       # shared typing backports
-tqdm>=4,<5                       # openai progress bars
+# ── Pinned openai transitive chain ────────────────────────────────────────────
+httpx==0.28.1
+anyio==4.9.0
+sniffio==1.3.1
+distro==1.9.0
+jiter==0.10.0
+tqdm==4.69.0
 
-# pydantic extras
-annotated-types>=0.6.0
-pydantic-core~=2.33.2
+# ── Pinned pydantic v2 transitive chain ───────────────────────────────────────
+pydantic-core==2.33.2
+typing-extensions==4.16.0
