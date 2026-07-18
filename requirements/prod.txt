@@ -1,0 +1,49 @@
+# =============================================================================
+# requirements/prod.txt
+#
+# Production dependencies = base + pinned transitive deps.
+#
+# Transitive packages are pinned here (==) to guarantee byte-for-byte
+# reproducible Docker builds across CI, Render, and local installs.
+#
+# Regenerate with:
+#   pip-compile requirements/prod.in --output-file requirements/prod.txt
+# =============================================================================
+
+-r base.txt
+
+# ── Pinned Transitives ────────────────────────────────────────────────────────
+# These are resolved by pip automatically from the above, but pinning them
+# here ensures 100% deterministic builds with no resolver surprises.
+
+# requests transitive chain
+certifi==2025.4.26
+charset-normalizer==3.4.2
+idna==3.10
+urllib3==2.4.0
+
+# pandas transitive chain
+python-dateutil==2.9.0.post0
+pytz==2025.2
+tzdata==2025.2
+six==1.17.0                      # python-dateutil dependency
+
+# uvicorn[standard] extras
+h11==0.16.0
+httptools==0.6.4
+websockets==15.0.1
+watchfiles==1.0.5
+python-multipart==0.0.20
+
+# openai transitive chain
+httpx>=0.28.0,<1.0               # openai uses httpx as HTTP client
+anyio>=4.9,<5                    # async primitives
+sniffio>=1.1                     # anyio backend detection
+distro>=1.7.0,<2                 # openai system info
+jiter>=0.10.0                    # openai fast JSON parsing
+typing-extensions>=4.10,<5       # shared typing backports
+tqdm>=4,<5                       # openai progress bars
+
+# pydantic extras
+annotated-types>=0.6.0
+pydantic-core~=2.33.2
