@@ -19,7 +19,7 @@
 starlette==0.46.2
 
 # ── click (uvicorn CLI entrypoint dependency) ─────────────────────────────────
-click==8.1.9
+click==8.1.8
 
 # ── httpcore (httpx transport layer) ─────────────────────────────────────────
 httpcore==1.0.9
