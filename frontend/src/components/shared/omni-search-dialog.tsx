@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/command"
 import { Compass, Target, Server, FileText, ArrowRight } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useTopCompanies } from "@/hooks/use-intelligence"
 
 export function OmniSearchDialog() {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
+  const { data: companies } = useTopCompanies();
 
   React.useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -39,16 +41,13 @@ export function OmniSearchDialog() {
       <CommandList className="bg-card/95 backdrop-blur-md">
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Entities">
-          <CommandItem onSelect={() => runCommand(() => router.push('/entities/ent-nexus'))} className="cursor-pointer">
-            <Server className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>Nexus Robotics</span>
-            <div className="ml-auto text-xs font-mono text-muted-foreground">Supply Chain AI</div>
-          </CommandItem>
-          <CommandItem onSelect={() => runCommand(() => router.push('/entities/ent-stratos'))} className="cursor-pointer">
-            <Server className="mr-2 h-4 w-4 text-muted-foreground" />
-            <span>Stratos Financial</span>
-            <div className="ml-auto text-xs font-mono text-muted-foreground">FinTech</div>
-          </CommandItem>
+          {companies?.map(company => (
+            <CommandItem key={company.id} onSelect={() => runCommand(() => router.push(`/entities/${company.id}`))} className="cursor-pointer">
+              <Server className="mr-2 h-4 w-4 text-muted-foreground" />
+              <span>{company.name}</span>
+              <div className="ml-auto text-xs font-mono text-muted-foreground">Company</div>
+            </CommandItem>
+          ))}
         </CommandGroup>
         <CommandSeparator />
         <CommandGroup heading="Commands">

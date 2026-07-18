@@ -1,11 +1,15 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { RadarGraph } from "@/components/ui/radar-graph"
-import { mockTrends } from "@/lib/mockData"
 import { Compass, Filter } from "lucide-react"
+import { useTrends } from "@/hooks/use-intelligence"
 
 export default function RadarPage() {
-  // Mock Plotly Data for the Topology Graph
+  const { data: trends, isLoading, isError } = useTrends();
+  
+  // Mock Plotly Data for the Topology Graph (Keep standard graph layout for now)
   const graphData = [
     {
       x: [1, 2, 3, 4, 2, 3],
@@ -56,7 +60,15 @@ export default function RadarPage() {
           </h2>
           
           <div className="space-y-3">
-            {mockTrends.map((trend: any) => (
+            {isLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-20 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
+                ))}
+              </div>
+            ) : isError ? (
+               <div className="text-red-400 text-sm">Failed to load trends</div>
+            ) : trends?.map((trend: any) => (
               <button key={trend.id} className="w-full text-left group">
                 <Card className="border-border bg-card/40 hover:bg-accent/50 transition-colors group-focus:border-signal-intelligence">
                   <CardContent className="p-4 flex items-center justify-between">
@@ -105,7 +117,11 @@ export default function RadarPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {mockTrends.map((trend: any) => (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={4} className="p-4 text-center text-muted-foreground">Loading...</td>
+                    </tr>
+                  ) : trends?.map((trend: any) => (
                     <tr key={trend.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-6 py-3 font-medium">{trend.name}</td>
                       <td className="px-6 py-3 text-right font-mono text-muted-foreground">
@@ -129,3 +145,4 @@ export default function RadarPage() {
     </div>
   )
 }
+
