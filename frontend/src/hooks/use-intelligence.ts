@@ -37,6 +37,15 @@ export function useEntity(id: string) {
   });
 }
 
+export function useSearch(query: string) {
+  return useQuery({
+    queryKey: ["search", query],
+    queryFn: () => IntelligenceService.searchEntities(query),
+    staleTime: STALE_TIME,
+    enabled: query.length >= 2,
+  });
+}
+
 export function useTimeline() {
   return useQuery({
     queryKey: ["timeline"],

@@ -72,6 +72,17 @@ export const IntelligenceService = {
     }
   },
 
+  searchEntities: async (query: string): Promise<{ companies: any[], events: any[] }> => {
+    try {
+      if (!query || query.length < 2) return { companies: [], events: [] };
+      const response = await apiClient.get(`${ENDPOINTS.SEARCH}?query=${encodeURIComponent(query)}`);
+      return response.data.data;
+    } catch (e) {
+      console.error(e);
+      return { companies: [], events: [] };
+    }
+  },
+
   getRecommendations: async (): Promise<Recommendation[]> => {
     try {
       const response = await apiClient.get(ENDPOINTS.RECOMMENDATIONS);
