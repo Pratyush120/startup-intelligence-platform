@@ -20,6 +20,7 @@ from src.api.search import router as search_router
 from src.api.pipeline import router as pipeline_router
 from src.utils.logger import get_logger
 from src.database.schema import SchemaManager
+from src.database.seeder import seed_database_if_empty
 
 logger = get_logger("fastapi")
 
@@ -34,6 +35,8 @@ async def startup_event():
     logger.info("Running database migrations...")
     SchemaManager().create_tables()
     logger.info("Database migrations complete.")
+    logger.info("Seeding initial data if empty...")
+    seed_database_if_empty()
 
 # 1. CORS middleware (Strict)
 app.add_middleware(
