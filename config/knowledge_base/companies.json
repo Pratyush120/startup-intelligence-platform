@@ -1,0 +1,77 @@
+[
+    {
+        "name": "Flipkart",
+        "aliases": ["Flipkart Internet"],
+        "sector": "E-commerce"
+    },
+    {
+        "name": "Zepto",
+        "aliases": [],
+        "sector": "Quick Commerce"
+    },
+    {
+        "name": "Swiggy",
+        "aliases": [],
+        "sector": "Food Delivery"
+    },
+    {
+        "name": "Zomato",
+        "aliases": [],
+        "sector": "Food Delivery"
+    },
+    {
+        "name": "Razorpay",
+        "aliases": [],
+        "sector": "FinTech"
+    },
+    {
+        "name": "PhonePe",
+        "aliases": [],
+        "sector": "FinTech"
+    },
+    {
+        "name": "Paytm",
+        "aliases": [],
+        "sector": "FinTech"
+    },
+    {
+        "name": "Groww",
+        "aliases": [],
+        "sector": "FinTech"
+    },
+    {
+        "name": "CRED",
+        "aliases": [],
+        "sector": "FinTech"
+    },
+    {
+        "name": "Meesho",
+        "aliases": [],
+        "sector": "E-commerce"
+    },
+    {
+        "name": "Lenskart",
+        "aliases": [],
+        "sector": "Retail"
+    },
+    {
+        "name": "Ather Energy",
+        "aliases": ["Ather"],
+        "sector": "EV"
+    },
+    {
+        "name": "Boat",
+        "aliases": ["boAt"],
+        "sector": "Consumer Electronics"
+    },
+    {
+        "name": "Freshworks",
+        "aliases": [],
+        "sector": "SaaS"
+    },
+    {
+        "name": "Dream11",
+        "aliases": [],
+        "sector": "Gaming"
+    }
+]
