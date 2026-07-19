@@ -55,23 +55,25 @@ async def chat_copilot(
         # Fetch real conversational response from OpenAI
         try:
             import os
+
             api_key = os.getenv("OPENAI_API_KEY")
             if not api_key:
                 chat_response = f"Simulated analysis for: '{request.prompt}'. Set OPENAI_API_KEY for full AI capabilities. (Context: {len(companies)} companies, {len(events)} events found)"
             else:
                 from openai import OpenAI
+
                 client = OpenAI(api_key=api_key)
                 sys_prompt = "You are a strategic intelligence copilot. Use the internal data context to answer the user's prompt."
                 user_prompt = f"User asks: {request.prompt}\n\nInternal Data Context:\n{context_str}"
-                
+
                 chat_completion = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
                         {"role": "system", "content": sys_prompt},
-                        {"role": "user", "content": user_prompt}
+                        {"role": "user", "content": user_prompt},
                     ],
                     max_tokens=400,
-                    temperature=0.4
+                    temperature=0.4,
                 )
                 chat_response = chat_completion.choices[0].message.content or ""
         except Exception as e:
