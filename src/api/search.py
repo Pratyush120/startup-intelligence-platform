@@ -40,23 +40,32 @@ async def search(
         sparklines[c_name] = history[-5:]
 
     serialized_companies = serialize_company_metrics(company_proxies, sparklines)
-    
+
     # Fetch real-time data from DuckDuckGo for live internet search
     try:
         from duckduckgo_search import DDGS
         from datetime import datetime, timezone
+
         ddgs = DDGS()
-        news_results = list(ddgs.news(keywords=f"{q} startup OR company OR tech OR business", max_results=3))
+        news_results = list(
+            ddgs.news(
+                keywords=f"{q} startup OR company OR tech OR business", max_results=3
+            )
+        )
         for nr in news_results:
-            events.append({
-                "company_name": q.title(),
-                "title": nr.get("title", ""),
-                "event_type": "Live News",
-                "published_at": nr.get("date", datetime.now(timezone.utc).isoformat()),
-                "business_impact": nr.get("body", "")[:200],
-                "ai_summary": nr.get("source", ""),
-                "importance_score": 7.0
-            })
+            events.append(
+                {
+                    "company_name": q.title(),
+                    "title": nr.get("title", ""),
+                    "event_type": "Live News",
+                    "published_at": nr.get(
+                        "date", datetime.now(timezone.utc).isoformat()
+                    ),
+                    "business_impact": nr.get("body", "")[:200],
+                    "ai_summary": nr.get("source", ""),
+                    "importance_score": 7.0,
+                }
+            )
     except Exception as e:
         print(f"DuckDuckGo search failed: {e}")
 

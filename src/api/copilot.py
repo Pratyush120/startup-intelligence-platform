@@ -4,7 +4,6 @@ from typing import List
 from src.api.response import StandardResponse, success_response
 from src.api.deps import get_repository
 from src.database.repository import Repository
-from src.pipeline.llm_analyzer import LLMAnalyzer
 
 router = APIRouter(tags=["Copilot"])
 
@@ -56,6 +55,7 @@ async def chat_copilot(
         # Fetch real conversational response from g4f chat
         try:
             from g4f.client import Client
+
             client = Client()
             prompt = f"User asks: {request.prompt}\n\nInternal Data Context:\n{context_str}\n\nProvide a helpful, conversational strategic analysis addressing the user's prompt using the context provided if relevant, or external knowledge if not."
             chat_completion = client.chat.completions.create(
@@ -64,7 +64,9 @@ async def chat_copilot(
             )
             chat_response = chat_completion.choices[0].message.content
         except Exception as e:
-            chat_response = f"I'm sorry, I encountered an issue generating a response: {str(e)}"
+            chat_response = (
+                f"I'm sorry, I encountered an issue generating a response: {str(e)}"
+            )
 
         return success_response(
             data=CopilotResponse(
