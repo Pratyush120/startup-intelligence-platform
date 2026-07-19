@@ -35,7 +35,7 @@ class GeminiProvider:
             logger.error(f"Failed to initialize Gemini Client: {e}")
             raise
 
-    def analyze_strategic_context(self, context_text: str, user_prompt: str) -> CopilotResponse:
+    def analyze_strategic_context(self, context_data: dict, user_prompt: str) -> CopilotResponse:
         system_instruction = (
             "You are the Strategic Decision Intelligence Copilot.\n\n"
             "You help executives, investors, analysts and founders.\n\n"
@@ -50,6 +50,20 @@ class GeminiProvider:
             "Sources Used"
         )
         
+        # Build structured context Markdown
+        structured_context = []
+        if "company" in context_data:
+            structured_context.append(f"### Company: {context_data['company']}")
+        if "business_summary" in context_data:
+            structured_context.append(f"**Business Summary:** {context_data['business_summary']}")
+        if "financials" in context_data and context_data["financials"]:
+            structured_context.append("**Financial Summary:**\n" + "\n".join(f"- {f.metric_name}: {f.value}" for f in context_data["financials"]))
+        if "latest_news" in context_data and context_data["latest_news"]:
+            structured_context.append("**Latest News:**\n" + "\n".join(f"- {n.title} ({n.publisher})" for n in context_data["latest_news"]))
+        if "competitors" in context_data and context_data["competitors"]:
+            structured_context.append("**Competitors:**\n" + "\n".join(f"- {c.name}" for c in context_data["competitors"]))
+        
+        context_text = "\n\n".join(structured_context)
         full_prompt = f"Context:\n{context_text}\n\nUser Question:\n{user_prompt}"
 
         try:

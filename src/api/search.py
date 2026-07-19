@@ -3,7 +3,7 @@ from typing import Any
 from src.api.response import StandardResponse, success_response
 from src.api.deps import get_repository
 from src.database.repository import Repository
-from src.knowledge.store import KnowledgeStore
+from src.services.intelligence_aggregator import IntelligenceAggregator
 from src.pipeline.api_serializer import (
     serialize_company_metrics,
     serialize_timeline_events,
@@ -23,17 +23,20 @@ async def search(
     offset: int = Query(0, ge=0),
     repo: Repository = Depends(get_repository),
 ):
-    store = KnowledgeStore(repo)
-    global_context = store.search_global(q)
+    aggregator = IntelligenceAggregator(repo)
+    global_context = await aggregator.build_global_context(q)
 
-    companies = global_context.get("companies", [])
-    events = global_context.get("events", [])
-    live_news = global_context.get("live_news", [])
+    # Convert db dictionary to list format expected by serializer
+    db_company = global_context.get("company", {})
+    companies = [db_company] if isinstance(db_company, dict) and "company_name" in db_company else []
+    
+    events = global_context.get("db_events", [])
+    latest_news = global_context.get("latest_news", [])
 
     company_proxies = []
     sparklines = {}
     for c in companies:
-        c_name = c["company_name"]
+        c_name = c.get("company_name", q)
         company_proxies.append(CompanyProxy(c))
         history = repo.get_company_history(c_name)
         if not history:
@@ -44,16 +47,16 @@ async def search(
 
     serialized_companies = serialize_company_metrics(company_proxies, sparklines)
 
-    # Blend SERP live_news into events
-    for nr in live_news:
+    # Blend aggregated news into events
+    for n in latest_news:
         events.append(
             {
                 "company_name": q.title(),
-                "title": nr.get("title", ""),
-                "event_type": "Live SERP News",
-                "published_at": nr.get("published_at", ""),
-                "business_impact": nr.get("snippet", "")[:200],
-                "ai_summary": nr.get("publisher", ""),
+                "title": n.title,
+                "event_type": f"Live News ({n.source.provider})",
+                "published_at": n.published_at,
+                "business_impact": n.snippet[:200],
+                "ai_summary": n.publisher,
                 "importance_score": 7.0,
             }
         )

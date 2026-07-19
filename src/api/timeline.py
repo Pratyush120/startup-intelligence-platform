@@ -15,10 +15,32 @@ async def get_timeline(
     event_type: Optional[str] = None,
     repo: Repository = Depends(get_repository),
 ):
+    from src.services.intelligence_aggregator import IntelligenceAggregator
     events = repo.get_recent_events(limit=limit, offset=offset, event_type=event_type)
 
-    # serialize_timeline_events natively handles DB rows (dicts)
-    serialized = serialize_timeline_events(events)
+    agg = IntelligenceAggregator(repo)
+    global_ctx = await agg.build_global_context("startup funding news")
+    
+    live_news = global_ctx.get("latest_news", [])
+    for n in live_news:
+        events.append(
+            {
+                "company_name": "Industry",
+                "title": n.title,
+                "event_type": f"Live News ({n.source.provider})",
+                "published_at": n.published_at,
+                "business_impact": n.snippet[:200],
+                "ai_summary": n.publisher,
+                "importance_score": 8.0,
+            }
+        )
+
+    # Sort combined events by published_at (descending)
+    def parse_date(e):
+        return e.get("published_at", "")
+    events.sort(key=parse_date, reverse=True)
+
+    serialized = serialize_timeline_events(events[:limit])
 
     return success_response(
         data=serialized,

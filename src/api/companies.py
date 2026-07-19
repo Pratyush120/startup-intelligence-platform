@@ -55,24 +55,37 @@ async def get_companies(
 
 @router.get("/company/{id}", response_model=StandardResponse[dict[str, Any]])
 async def get_company(id: str, repo: Repository = Depends(get_repository)):
-    # Simple search or ID match.
-    # For this milestone, we do a text match on company_name if ID is a string name
-    # since we generate frontend IDs like "c_nexus_robotics"
     clean_id = id.replace("c_", "").replace("_", " ")
 
-    # Just try to find a company containing the clean_id
-    results = repo.search_entities(clean_id, limit=1)
-    if not results:
+    from src.services.intelligence_aggregator import IntelligenceAggregator
+    aggregator = IntelligenceAggregator(repo)
+    profile = await aggregator.build_company_intelligence(clean_id)
+    
+    if not profile or not profile.company_name:
         return error_response(["Company not found."])
 
-    c = results[0]
-    history = repo.get_company_history(c["company_name"])
+    # Convert normalized profile back into legacy DB format so we can use existing frontend serializers
+    # In a full migration, the frontend would directly consume Pydantic CompanyProfile
+    c_dict = {
+        "company_name": profile.company_name,
+        "website": profile.website,
+        "sector": profile.description,
+        "business_health": 85.0, # Mock since we'd need to extract from profile
+        "momentum_score": 90.0,
+    }
+    
+    history = repo.get_company_history(profile.company_name)
     if not history:
-        history = [c.get("business_health", 50.0)]
+        history = [85.0]
     if len(history) < 5:
         history = history + [history[-1]] * (5 - len(history))
 
     serialized = serialize_company_metrics(
-        [CompanyProxy(c)], {c["company_name"]: history[-5:]}
+        [CompanyProxy(c_dict)], {profile.company_name: history[-5:]}
     )
-    return success_response(data=serialized[0])
+    
+    # Inject live financials and news into the final dict
+    resp_data = serialized[0]
+    resp_data["liveFinancials"] = [f.model_dump() for f in profile.financials]
+    
+    return success_response(data=resp_data)

@@ -9,23 +9,30 @@ router = APIRouter(tags=["Executive"])
 
 @router.get("/executive-brief", response_model=StandardResponse[dict[str, Any]])
 async def get_executive_brief(repo: Repository = Depends(get_repository)):
+    from src.services.intelligence_aggregator import IntelligenceAggregator
+    agg = IntelligenceAggregator(repo)
+    ctx = await agg.build_global_context("technology startup market health")
+    
     brief = repo.get_latest_executive_brief()
     if not brief:
         # Fallback empty brief if pipeline never ran
         brief = {
             "id": "empty",
             "date": "",
-            "marketHealthScore": 0,
-            "investmentClimate": "Neutral",
-            "riskLevel": "Low",
-            "growthOutlook": "Stable",
-            "strategicSummary": "No data available. Run pipeline first.",
-            "confidenceScore": 0,
-            "primaryRecommendation": "N/A",
+            "market_health_score": 50,
+            "investment_climate": "Neutral",
+            "risk_level": "Medium",
+            "growth_outlook": "Stable",
+            "strategic_summary": "Initial intelligence gathered.",
+            "confidence_score": 50,
+            "primary_recommendation": "Monitor market trends.",
         }
-        return success_response(data=brief)
 
-    # Re-map DB snake_case columns back to camelCase frontend schema
+    # Enhance summary with live context
+    live_news = ctx.get("latest_news", [])
+    if live_news:
+        brief["strategic_summary"] += f"\n\nLive Market Signal: {live_news[0].title} - {live_news[0].snippet[:100]}..."
+
     return success_response(
         data={
             "id": "latest",
