@@ -4,11 +4,14 @@ import { motion } from "framer-motion";
 import { FileText, GitCompare, RefreshCw, Download, LineChart, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRunPipeline } from "@/hooks/use-intelligence";
+import { useState } from "react";
+import { CompareCompaniesModal } from "./CompareCompaniesModal";
 import { toast } from "sonner";
 
 export function QuickActionCenter() {
   const router = useRouter();
   const runPipelineMutation = useRunPipeline();
+  const [isCompareOpen, setIsCompareOpen] = useState(false);
 
   const handleAction = (id: string) => {
     switch (id) {
@@ -16,8 +19,7 @@ export function QuickActionCenter() {
         router.push('/reports');
         break;
       case 'compare':
-        // Trigger command palette or navigate to a compare page
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+        setIsCompareOpen(true);
         break;
       case 'refresh':
         toast("Pipeline triggered", { description: "Data ingestion process has started in the background." });
@@ -49,6 +51,7 @@ export function QuickActionCenter() {
   ];
 
   return (
+    <>
     <section className="bg-surface-1 border border-border-default rounded-md p-4">
       <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
         {actions.map(action => (
@@ -66,5 +69,7 @@ export function QuickActionCenter() {
         ))}
       </div>
     </section>
+      <CompareCompaniesModal isOpen={isCompareOpen} onClose={() => setIsCompareOpen(false)} />
+    </>
   );
 }

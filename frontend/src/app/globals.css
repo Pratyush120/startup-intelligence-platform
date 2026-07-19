@@ -197,3 +197,56 @@
   .elevation-1 { box-shadow: var(--shadow-elevation-1); }
   .elevation-2 { box-shadow: var(--shadow-elevation-2); }
 }
+
+@media print {
+  /* Hide UI elements that shouldn't be printed */
+  nav, 
+  header, 
+  aside,
+  [role="dialog"],
+  button,
+  .no-print,
+  #command-palette,
+  .fixed,
+  .sticky {
+    display: none !important;
+  }
+
+  /* Reset layout for printing */
+  body, 
+  main,
+  .container {
+    background: white !important;
+    color: black !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Force light theme colors for printing */
+  * {
+    --color-bg-base: #FFFFFF !important;
+    --color-bg-surface-1: #FFFFFF !important;
+    --color-bg-surface-2: #F4F4F5 !important;
+    --color-bg-surface-3: #E4E4E7 !important;
+    --color-fg-primary: #000000 !important;
+    --color-fg-secondary: #333333 !important;
+    --color-border-default: #E4E4E7 !important;
+    border-color: #E4E4E7 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .bg-surface-1, .bg-surface-2, .bg-surface-3 {
+    background-color: white !important;
+    border: 1px solid #ccc !important;
+  }
+
+  /* Ensure charts and cards break nicely across pages */
+  section, article, .card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 2rem !important;
+  }
+}
