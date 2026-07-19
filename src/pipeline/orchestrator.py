@@ -36,7 +36,7 @@ from src.analytics.market_engine import MarketEngine
 from src.analytics.executive_engine import ExecutiveEngine
 from src.analytics.trend_engine import TrendEngine
 
-from src.database.schema import SchemaManager
+
 from src.database.repository import Repository
 from src.utils.logger import get_logger
 
@@ -81,13 +81,8 @@ class PipelineOrchestrator:
         # ------------------------------------------------------------------
         # STEP 0: Schema + Audit trail
         # ------------------------------------------------------------------
-        try:
-            SchemaManager().create_tables()
-            logger.info("Step 0: Schema ready.")
-        except Exception as e:
-            logger.error(f"Step 0 FAILED: {e}")
-            result.run_metadata = {"status": "schema_error", "error": str(e)}
-            return result
+        # Schema is now managed by Alembic in the lifespan context of FastAPI.
+        logger.info("Step 0: Schema ready (managed by Alembic).")
 
         repository = Repository()
         run_id = repository.start_pipeline_run()

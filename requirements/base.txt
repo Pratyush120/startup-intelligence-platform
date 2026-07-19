@@ -52,3 +52,10 @@ rapidfuzz~=3.13.0
 # Used in src/pipeline/llm_analyzer.py (lazy import guarded by try/except)
 # Pinned to 1.x to avoid 2.x breaking API surface changes
 openai~=1.93.3
+
+# ── Database Migrations ───────────────────────────────────────────────────────
+alembic~=1.14.0
+
+# ── Asynchronous Tasks ────────────────────────────────────────────────────────
+celery~=5.4.0
+redis~=5.2.1

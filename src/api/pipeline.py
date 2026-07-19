@@ -1,28 +1,20 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends
 from typing import Any
 from src.api.response import StandardResponse, success_response
 from src.api.deps import get_repository
 from src.database.repository import Repository
-from src.pipeline.orchestrator import PipelineOrchestrator
+from src.worker import run_pipeline_task
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["Pipeline"])
 
 
-def run_pipeline_task():
-    try:
-        orchestrator = PipelineOrchestrator()
-        orchestrator.run()
-    except Exception as e:
-        logger.error(f"Background pipeline execution failed: {e}")
-
-
 @router.post("/pipeline/run", response_model=StandardResponse[dict[str, str]])
-async def run_pipeline(background_tasks: BackgroundTasks):
-    background_tasks.add_task(run_pipeline_task)
+async def run_pipeline():
+    task = run_pipeline_task.delay()
     return success_response(
-        data={"message": "Pipeline execution started in the background."},
+        data={"message": "Pipeline execution started via Celery.", "task_id": task.id},
         meta={"status": "running"},
     )
 

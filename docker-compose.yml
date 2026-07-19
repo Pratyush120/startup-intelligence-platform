@@ -11,12 +11,36 @@ services:
       - .:/app
     environment:
       - ENVIRONMENT=development
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A src.worker worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - ENVIRONMENT=development
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
 
   frontend:
     build:
@@ -34,3 +58,6 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+
+volumes:
+  redis_data:

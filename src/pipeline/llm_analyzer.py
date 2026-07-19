@@ -45,18 +45,30 @@ class MockProvider(LLMProvider):
         self, title: str, description: str, event_type: str, company: str
     ) -> LLMAnalysis:
         start = time.time()
-        # Simulate slight delay
         time.sleep(0.01)
+        
+        # Heuristic fallback when no LLM API key is present
+        summary = description[:300] + "..." if len(description) > 300 else description
+        if not summary:
+            summary = title
+            
+        impact_keywords = ["revenue", "growth", "layoff", "acquire", "funding"]
+        impact = f"Potential impact on {company}'s market trajectory."
+        for kw in impact_keywords:
+            if kw in description.lower():
+                impact = f"Significant impact detected regarding {kw} for {company}."
+                break
+
         return LLMAnalysis(
-            executive_summary=f"Mock summary for {company}: {title}",
-            business_impact=f"Moderate impact on {company}'s market positioning.",
-            strategic_recommendation="Monitor competitors and evaluate strategic alternatives.",
-            risk="Execution risks in changing macroeconomic climate.",
-            opportunity="Potential for market expansion.",
-            key_insight="Strategic positioning remains vital.",
-            confidence=0.85,
-            prompt_version="mock_v1",
-            token_usage=42,
+            executive_summary=summary,
+            business_impact=impact,
+            strategic_recommendation=f"Monitor {company} closely in the short term.",
+            risk="Macroeconomic and execution risks.",
+            opportunity="Market expansion and product innovation.",
+            key_insight=f"Strategic developments for {company} are ongoing.",
+            confidence=0.75,
+            prompt_version="heuristic_v1",
+            token_usage=0,
             processing_time_ms=int((time.time() - start) * 1000),
         )
 

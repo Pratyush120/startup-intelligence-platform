@@ -34,27 +34,49 @@ async def chat_copilot(
     try:
         analyzer = LLMAnalyzer()
 
-        # We need a proper analysis from the LLM based on the prompt.
-        # We'll adapt LLMAnalyzer to just generate a response if it were a direct chat,
-        # but for now we'll do a mock or use the LLMAnalyzer's analyze method.
-        # Since analyze() expects title/desc, we'll wrap the prompt.
-
-        # Real implementation using the analyzer:
+        # Query the database to find actual matching intelligence
+        companies = repo.search_entities(request.prompt, limit=3)
+        events = repo.search_events(request.prompt, limit=5)
+        
+        if not companies and not events:
+            return success_response(
+                data=CopilotResponse(
+                    role="assistant",
+                    content=f"I couldn't find any specific intelligence on '{request.prompt}' in our current database. Please try another query or run the pipeline to gather more data.",
+                ).model_dump()
+            )
+            
+        # Build context from database results
+        context_lines = []
+        if companies:
+            context_lines.append(f"Matching Companies:")
+            for c in companies:
+                context_lines.append(f"- {c['company_name']} (Health: {c.get('business_health', 0)}, Momentum: {c.get('momentum_score', 0)})")
+        if events:
+            context_lines.append(f"\nRecent Events:")
+            for e in events:
+                context_lines.append(f"- {e['title']}")
+                
+        context_str = "\n".join(context_lines)
+        
+        # Analyze using the LLM/Heuristic provider
         analysis = analyzer.analyze(
-            title="User Query",
-            description=request.prompt,
+            title=request.prompt,
+            description=context_str,
             event_type="Strategic Inquiry",
-            company="Market",
+            company="Various" if len(companies) != 1 else companies[0]["company_name"],
         )
+
+        final_response = f"Based on our intelligence database:\n\n{analysis.executive_summary}\n\n{context_str}"
 
         return success_response(
             data=CopilotResponse(
                 role="assistant",
-                content=analysis.executive_summary,
+                content=final_response,
                 cersr=CERSRResponse(
                     confidence=int(analysis.confidence * 100),
                     evidence=analysis.business_impact,
-                    sources=["Intelligence Database", "Live Pipeline"],
+                    sources=["Intelligence Database"],
                     reasoning=analysis.key_insight,
                     strategy=analysis.strategic_recommendation,
                 ),

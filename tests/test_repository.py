@@ -2,14 +2,13 @@ import pytest
 from src.database.repository import Repository
 from src.analytics.company_engine import CompanyIntelligence
 
-from src.database.schema import SchemaManager
 from src.database.repository import repo_cache
-
+import subprocess
 
 @pytest.fixture
 def repo():
     # Make sure tables exist
-    SchemaManager().create_tables()
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
     repo_cache.cache.clear()
     return Repository()
 

@@ -2,8 +2,8 @@ import pytest
 from fastapi.testclient import TestClient
 from src.main import app
 from src.database.repository import Repository
-from src.database.schema import SchemaManager
 from unittest.mock import patch
+import subprocess
 
 # Create a test client
 client = TestClient(app)
@@ -12,13 +12,8 @@ client = TestClient(app)
 @pytest.fixture(scope="module", autouse=True)
 def setup_test_db():
     repo = Repository()
-    schema = SchemaManager()
-    schema.create_tables()
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
     yield repo
-    repo.db.execute("DROP TABLE IF EXISTS executive_briefs")
-    repo.db.execute("DROP TABLE IF EXISTS companies")
-    repo.db.execute("DROP TABLE IF EXISTS recommendations")
-    repo.db.execute("DROP TABLE IF EXISTS events")
     repo.close()
 
 
@@ -77,11 +72,17 @@ def test_search_endpoint():
     assert "events" in data["data"]
 
 
-@patch("src.api.pipeline.BackgroundTasks.add_task")
-def test_pipeline_run_endpoint(mock_add_task):
+@patch("src.worker.run_pipeline_task.delay")
+def test_pipeline_run_endpoint(mock_delay):
+    # Mock the return value of delay() which returns an AsyncResult
+    class MockResult:
+        id = "mock_task_id"
+    mock_delay.return_value = MockResult()
+    
     response = client.post("/api/v1/pipeline/run")
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
     assert data["meta"]["status"] == "running"
-    mock_add_task.assert_called_once()
+    assert data["data"]["task_id"] == "mock_task_id"
+    mock_delay.assert_called_once()

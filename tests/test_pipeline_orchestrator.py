@@ -9,8 +9,7 @@ from src.pipeline.orchestrator import PipelineOrchestrator
 
 
 @patch("src.pipeline.orchestrator.Repository")
-@patch("src.pipeline.orchestrator.SchemaManager")
-def test_full_pipeline_run(MockSchema, MockRepo):
+def test_full_pipeline_run(MockRepo):
     # Setup mock repository
     mock_repo = MockRepo.return_value
     mock_repo.start_pipeline_run.return_value = 1

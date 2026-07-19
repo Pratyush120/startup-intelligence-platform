@@ -23,7 +23,7 @@ from src.api.trends import router as trends_router
 from src.api.modules import router as modules_router
 from src.api.copilot import router as copilot_router
 from src.utils.logger import get_logger
-from src.database.schema import SchemaManager
+
 from src.database.seeder import seed_database_if_empty
 
 logger = get_logger("fastapi")
@@ -41,8 +41,10 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info("Running database migrations...")
-    SchemaManager().create_tables()
+    logger.info("Running database migrations via Alembic...")
+    import subprocess
+
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
     logger.info("Database migrations complete.")
     logger.info("Seeding initial data if empty...")
     seed_database_if_empty()

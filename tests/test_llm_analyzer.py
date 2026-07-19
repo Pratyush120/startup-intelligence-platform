@@ -12,7 +12,7 @@ def test_mock_provider():
     analysis = provider.analyze("Test Title", "Test Desc", "Funding", "Startup")
     assert isinstance(analysis, LLMAnalysis)
     assert analysis.executive_summary != ""
-    assert analysis.token_usage == 42
+    assert analysis.token_usage == 0
 
 
 def test_openai_provider_fallback():
@@ -30,7 +30,7 @@ def test_openai_provider_fallback():
         # So we should test Analyzer fallback.
         analyzer = LLMAnalyzer(provider=provider)
         analysis = analyzer.analyze("Test Title", "Test Desc", "Funding", "Startup")
-        assert analysis.confidence == 0.85  # Mock provider fallback confidence
+        assert analysis.confidence == 0.75  # Mock provider fallback confidence
 
 
 def test_llm_analyzer():

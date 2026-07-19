@@ -7,7 +7,7 @@ Useful for ephemeral environments like Render where the database resets on deplo
 
 from datetime import datetime, timezone, timedelta
 from src.database.repository import Repository
-from src.database.schema import SchemaManager
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -161,6 +161,8 @@ def seed_database_if_empty():
     logger.info("Database seeding complete.")
 
 
+import subprocess
+
 if __name__ == "__main__":
-    SchemaManager().create_tables()
+    subprocess.run(["alembic", "upgrade", "head"], check=True)
     seed_database_if_empty()
