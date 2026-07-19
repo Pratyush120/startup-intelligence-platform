@@ -94,7 +94,7 @@ export function OmniSearchDialog() {
           <>
             <CommandSeparator />
             <CommandGroup heading="Commands">
-              <CommandItem onSelect={() => runCommand(() => router.push('/dashboard'))} className="cursor-pointer">
+              <CommandItem onSelect={() => runCommand(() => router.push('/'))} className="cursor-pointer">
                 <FileText className="mr-2 h-4 w-4 text-muted-foreground" />
                 <span>View Morning Brief</span>
               </CommandItem>
