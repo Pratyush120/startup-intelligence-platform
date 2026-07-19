@@ -33,7 +33,12 @@ async def chat_copilot(
     try:
         # Query the database to find actual matching intelligence
         companies = repo.search_entities(request.prompt, limit=3)
+        if not companies:
+            companies = repo.get_top_companies(limit=3)
+
         events = repo.search_events(request.prompt, limit=5)
+        if not events:
+            events = repo.get_recent_events(limit=5)
 
         # Build context from database results
         context_lines = []
