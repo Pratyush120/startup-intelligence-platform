@@ -19,6 +19,10 @@ import {
   useMarketSnapshot, 
   useMetrics 
 } from "@/hooks/use-intelligence";
+import { useWatchlistStore } from "@/stores/watchlist.store";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Star, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { data: timeline, isLoading: loadingTimeline, isError: errorTimeline } = useTimeline();
@@ -28,6 +32,13 @@ export default function DashboardPage() {
   const { data: snapshot, isLoading: loadingSnapshot, isError: errorSnapshot } = useMarketSnapshot();
   const { data: companies, isLoading: loadingCompanies, isError: errorCompanies } = useTopCompanies();
   const { data: recommendations, isLoading: loadingRecs, isError: errorRecs } = useRecommendations();
+  
+  const watchedEntityIds = useWatchlistStore((state) => state.watchedEntityIds);
+  const router = useRouter();
+
+  // Derived state based on Watchlist
+  const watchedCompanies = companies?.filter(c => watchedEntityIds.includes(c.name)) || [];
+  const overnightDevelopments = timeline?.filter(t => watchedEntityIds.includes(t.companyName) || watchedEntityIds.length === 0).slice(0, 5) || [];
 
   return (
     <div className="flex flex-col gap-10 pb-16">
@@ -46,16 +57,48 @@ export default function DashboardPage() {
         <QuickActionCenter />
       </div>
 
-      {/* 1. Hero Narrative Layer */}
+      {/* NEW: Watchlist Section */}
       <section>
-        {loadingBrief ? (
-          <div className="h-48 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : errorBrief ? (
-          <div className="p-4 border border-red-500/50 bg-red-500/10 rounded-xl text-red-200">Failed to load Executive Brief.</div>
-        ) : executiveBrief ? (
-          <ExecutiveBrief data={executiveBrief} />
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-heading font-semibold flex items-center gap-2">
+            <Star className="w-5 h-5 text-yellow-500 fill-yellow-500/20" /> My Watchlist
+          </h2>
+        </div>
+        {watchedCompanies.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {watchedCompanies.map(company => (
+              <Card key={company.id} className="bg-card/40 backdrop-blur-sm border-border hover:bg-accent/50 cursor-pointer transition-colors" onClick={() => router.push(`/entities/${company.id}`)}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex justify-between items-start">
+                    {company.name}
+                    <span className={company.momentum > 70 ? "text-signal-positive text-sm" : "text-signal-danger text-sm"}>{company.momentum} Momentum</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xs text-muted-foreground">{company.recommendation || "Monitoring"}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         ) : (
-          <div className="p-4 border border-white/10 rounded-xl text-slate-400">No executive brief available.</div>
+          <div className="p-8 border border-dashed border-border rounded-xl text-center text-muted-foreground bg-muted/10">
+            <EyeOff className="w-8 h-8 mx-auto mb-3 opacity-50" />
+            <p>You aren't watching any entities yet.</p>
+            <p className="text-xs mt-1">Search for a company and click the star to add it here.</p>
+          </div>
+        )}
+      </section>
+
+      {/* NEW: Overnight Developments */}
+      <section>
+        <div className="mb-4">
+          <h2 className="text-xl font-heading font-semibold">Overnight Developments</h2>
+          <p className="text-sm text-muted-foreground font-mono mt-1">Recent events from your watchlist and the broader market</p>
+        </div>
+        {loadingTimeline ? (
+           <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
+        ) : (
+           <IntelligenceTimeline events={overnightDevelopments} />
         )}
       </section>
 
@@ -97,28 +140,12 @@ export default function DashboardPage() {
         ) : null}
       </section>
 
-      <section>
-        {loadingCompanies ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : companies && companies.length > 0 ? (
-          <TopCompaniesTable companies={companies} />
-        ) : null}
-      </section>
-
       {/* 5. Deep Intelligence Layer (Milestone 4) */}
       <section>
         {loadingRecs ? (
           <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
         ) : recommendations && recommendations.length > 0 ? (
           <RecommendationCenter recommendations={recommendations} />
-        ) : null}
-      </section>
-
-      <section>
-        {loadingTimeline ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : timeline && timeline.length > 0 ? (
-          <IntelligenceTimeline events={timeline} />
         ) : null}
       </section>
 

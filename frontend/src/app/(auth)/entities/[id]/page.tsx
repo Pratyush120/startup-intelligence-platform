@@ -5,14 +5,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { BusinessScore } from "@/components/ui/business-score"
-import { ShieldAlert, ExternalLink } from "lucide-react"
+import { ShieldAlert, ExternalLink, Star } from "lucide-react"
 import { useEntity, useTimeline } from "@/hooks/use-intelligence"
+import { useWatchlistStore } from "@/stores/watchlist.store"
 
 export default function EntityPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   
   const { data: entityData, isLoading: loadingEntity, isError: errorEntity } = useEntity(resolvedParams.id);
   const { data: timelineData, isLoading: loadingTimeline } = useTimeline();
+  
+  const isWatched = useWatchlistStore((state) => state.isWatched(entityData?.name || ''));
+  const addEntity = useWatchlistStore((state) => state.addEntity);
+  const removeEntity = useWatchlistStore((state) => state.removeEntity);
 
   // The backend currently returns a CompanyMetric for entities. 
   // We'll map it to the UI requirements dynamically.
@@ -54,7 +59,16 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
               {entity.name.charAt(0)}
             </div>
             <div>
-              <h1 className="text-3xl font-heading font-semibold tracking-tight">{entity.name}</h1>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-heading font-semibold tracking-tight">{entity.name}</h1>
+                <button 
+                  onClick={() => isWatched ? removeEntity(entity.name) : addEntity(entity.name)}
+                  className={`p-2 rounded-full transition-colors ${isWatched ? 'text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                  title={isWatched ? "Remove from watchlist" : "Add to watchlist"}
+                >
+                  <Star className={`w-5 h-5 ${isWatched ? 'fill-current' : ''}`} />
+                </button>
+              </div>
               <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                 <Badge variant="outline" className="font-mono bg-transparent rounded-sm text-[10px]">Company</Badge>
                 <span>Technology</span>
