@@ -21,7 +21,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
   const company1 = companies?.find(c => c.name === selectedCompany1) || null;
   const company2 = companies?.find(c => c.name === selectedCompany2) || null;
 
-  const renderMetric = (label: string, value1: any, value2: any, icon: React.ElementType, higherIsBetter = true) => {
+  const renderMetric = (label: string, value1: any, value2: any, Icon: React.ElementType, higherIsBetter = true) => {
     let color1 = "text-primary";
     let color2 = "text-primary";
     
@@ -39,7 +39,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
       <div className="grid grid-cols-3 gap-4 py-3 border-b border-border-default items-center">
         <div className={`font-mono text-lg text-center ${color1}`}>{value1 !== undefined ? value1 : "-"}</div>
         <div className="flex flex-col items-center text-secondary gap-1">
-          {icon && <icon className="w-4 h-4" />}
+          {Icon && <Icon className="w-4 h-4" />}
           <span className="text-xs uppercase tracking-wider font-medium">{label}</span>
         </div>
         <div className={`font-mono text-lg text-center ${color2}`}>{value2 !== undefined ? value2 : "-"}</div>
