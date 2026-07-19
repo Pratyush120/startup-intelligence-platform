@@ -1,5 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { TopAppBar } from "@/components/layout/TopAppBar";
+import { CommandPalette } from "@/components/layout/CommandPalette";
+import { AICopilot } from "@/components/layout/AICopilot";
 
 export default function AuthLayout({
   children,
@@ -8,6 +10,8 @@ export default function AuthLayout({
 }) {
   return (
     <div className="flex h-screen w-full bg-base overflow-hidden">
+      <CommandPalette />
+      <AICopilot />
       <Sidebar />
       <div className="flex-1 flex flex-col h-full relative overflow-hidden">
         <TopAppBar />

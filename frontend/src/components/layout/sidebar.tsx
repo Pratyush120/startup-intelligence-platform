@@ -10,7 +10,11 @@ import {
   Bot
 } from "lucide-react";
 
+import { useUIStore } from "@/store/ui.store";
+
 export function Sidebar() {
+  const openCopilot = useUIStore(state => state.openCopilot);
+  
   return (
     <aside className="w-64 border-r border-border-default bg-surface-1 flex flex-col h-full">
       <div className="p-6">
@@ -40,18 +44,13 @@ export function Sidebar() {
           <FileText className="w-4 h-4" />
           Reports Library
         </Link>
-        <Link 
-          href="#"
-          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
-          onClick={(e) => {
-             e.preventDefault();
-             // Copilot toggle will be implemented via global state/context later
-             alert("Global AI Copilot opening...");
-          }}
+        <button 
+          className="flex w-full items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
+          onClick={() => openCopilot()}
         >
           <Bot className="w-4 h-4" />
           AI Copilot
-        </Link>
+        </button>
       </nav>
 
       <div className="p-4 mt-auto">

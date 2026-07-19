@@ -77,4 +77,7 @@ export interface MetricCard {
   trendLabel: string;
   sparkline: number[];
   iconType: 'Building' | 'DollarSign' | 'Activity' | 'TrendingUp' | 'ShieldAlert' | 'BrainCircuit';
+  insight?: string;
+  impact?: string;
+  confidence?: number;
 }

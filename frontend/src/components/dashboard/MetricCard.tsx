@@ -73,7 +73,7 @@ export function MetricCard({ data }: MetricCardProps) {
           </div>
         </div>
 
-        <div className="w-24 h-12 opacity-80 group-hover:opacity-100 transition-opacity">
+        <div className="w-24 h-12 opacity-80 group-hover:opacity-20 transition-opacity">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <defs>
@@ -94,6 +94,25 @@ export function MetricCard({ data }: MetricCardProps) {
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+      
+      {/* Progressive Disclosure: Why it matters */}
+      <div className="absolute inset-0 bg-surface-2 p-5 flex flex-col justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20 overflow-hidden">
+        <h4 className="text-xs font-mono uppercase tracking-wider text-secondary mb-2">Why it matters</h4>
+        <p className="text-sm text-primary leading-snug mb-3">
+          {data.insight || `${data.label} trend indicates a shift in market dynamics.`}
+        </p>
+        <div className="flex flex-col gap-1.5 mt-auto">
+          {data.impact && (
+            <div className="text-xs text-secondary flex items-start gap-1">
+              <span className="text-primary mt-0.5">•</span>
+              <span>{data.impact}</span>
+            </div>
+          )}
+          <div className="text-[10px] font-mono text-tertiary">
+            Confidence: {data.confidence || 85}%
+          </div>
         </div>
       </div>
     </motion.div>

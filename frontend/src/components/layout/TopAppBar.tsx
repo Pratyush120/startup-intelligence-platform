@@ -3,10 +3,12 @@
 import { Search, Bell, Moon, Sun, User } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { useUIStore } from "@/store/ui.store";
 
 export function TopAppBar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const openSearch = useUIStore(state => state.openSearch);
 
   useEffect(() => {
     setMounted(true);
@@ -17,7 +19,10 @@ export function TopAppBar() {
       
       {/* Global Search / Command Palette Trigger */}
       <div className="flex items-center flex-1">
-        <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-default bg-surface-1 text-secondary hover:text-primary hover:border-border-strong transition-colors w-[400px] group focus-visible:ring-2 focus-visible:ring-focus outline-none">
+        <button 
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-default bg-surface-1 text-secondary hover:text-primary hover:border-border-strong transition-colors w-[400px] group focus-visible:ring-2 focus-visible:ring-focus outline-none"
+          onClick={() => openSearch()}
+        >
           <Search className="w-4 h-4" />
           <span className="text-sm">Analyze a company, market or competitor...</span>
           <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border-default bg-base px-1.5 font-mono text-[10px] font-medium text-tertiary opacity-100 group-hover:opacity-100 transition-opacity">
