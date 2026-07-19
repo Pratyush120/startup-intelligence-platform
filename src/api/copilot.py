@@ -52,17 +52,28 @@ async def chat_copilot(
         if not context_str:
             context_str = "No specific data found in internal database."
 
-        # Fetch real conversational response from g4f chat
+        # Fetch real conversational response from OpenAI
         try:
-            from g4f.client import Client
-
-            client = Client()
-            prompt = f"User asks: {request.prompt}\n\nInternal Data Context:\n{context_str}\n\nProvide a helpful, conversational strategic analysis addressing the user's prompt using the context provided if relevant, or external knowledge if not."
-            chat_completion = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[{"role": "user", "content": prompt}],
-            )
-            chat_response = chat_completion.choices[0].message.content
+            import os
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                chat_response = f"Simulated analysis for: '{request.prompt}'. Set OPENAI_API_KEY for full AI capabilities. (Context: {len(companies)} companies, {len(events)} events found)"
+            else:
+                from openai import OpenAI
+                client = OpenAI(api_key=api_key)
+                sys_prompt = "You are a strategic intelligence copilot. Use the internal data context to answer the user's prompt."
+                user_prompt = f"User asks: {request.prompt}\n\nInternal Data Context:\n{context_str}"
+                
+                chat_completion = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[
+                        {"role": "system", "content": sys_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    max_tokens=400,
+                    temperature=0.4
+                )
+                chat_response = chat_completion.choices[0].message.content or ""
         except Exception as e:
             chat_response = (
                 f"I'm sorry, I encountered an issue generating a response: {str(e)}"

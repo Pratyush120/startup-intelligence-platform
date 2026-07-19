@@ -9,22 +9,16 @@
 #     while preventing breaking major/minor changes
 #
 # Pinning policy:
-#   - ~= X.Y.Z  →  accepts X.Y.Z and newer X.Y patches
-#   - == X.Y.Z  →  used for security-sensitive or ABI-sensitive packages
 # =============================================================================
 
-# ── Web Framework ─────────────────────────────────────────────────────────────
 fastapi~=0.115.12
 uvicorn[standard]~=0.34.3        # [standard] includes websockets + h11 extras
 
-# ── Data Validation ───────────────────────────────────────────────────────────
 pydantic~=2.11.7
 pydantic-settings~=2.10.1
 
-# ── Structured Logging ────────────────────────────────────────────────────────
 structlog~=25.4.0
 
-# ── Data Analysis ─────────────────────────────────────────────────────────────
 # pandas is used in src/services/data_service.py for DataFrame returns.
 pandas~=2.3.0
 
@@ -32,30 +26,24 @@ pandas~=2.3.0
 # cp311 wheel confirmed on PyPI for numpy==2.2.6.
 numpy~=2.2.6
 
-# ── HTTP Client ───────────────────────────────────────────────────────────────
 # Used in src/collectors/base_collector.py + urllib3 retry adapter
 requests~=2.32.3
 
-# ── Feed Parsing ─────────────────────────────────────────────────────────────
 # Used in src/collectors/google_news_collector.py
 feedparser~=6.0.11
 
-# ── Env Management ───────────────────────────────────────────────────────────
 # Used by pydantic-settings for .env file loading
 python-dotenv~=1.1.0
 
-# ── Fuzzy String Matching ─────────────────────────────────────────────────────
 # Used in src/pipeline/deduplicator.py and src/api/search.py
 rapidfuzz~=3.13.0
 
-# ── AI Provider ──────────────────────────────────────────────────────────────
 # Used in src/pipeline/llm_analyzer.py (lazy import guarded by try/except)
 # Pinned to 1.x to avoid 2.x breaking API surface changes
 openai~=1.93.3
 
-# ── Database Migrations ───────────────────────────────────────────────────────
 alembic~=1.14.0
 
-# ── Asynchronous Tasks ────────────────────────────────────────────────────────
 celery~=5.4.0
 redis~=5.2.1
+duckduckgo-search~=6.2.0
