@@ -45,7 +45,7 @@ six==1.17.0
 # ── Pinned uvicorn[standard] extras ───────────────────────────────────────────
 h11==0.16.0
 httptools==0.6.4
-websockets==15.0.1
+websockets<15.0
 watchfiles==1.0.5
 python-multipart==0.0.20
 
