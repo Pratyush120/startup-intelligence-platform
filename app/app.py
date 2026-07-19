@@ -3,6 +3,7 @@ Strategic Decision Intelligence Platform
 
 Dashboard Entry Point
 """
+
 # ruff: noqa: E402
 import sys
 from pathlib import Path
@@ -38,7 +39,7 @@ render_sidebar()
 st.title("📈 Strategic Decision Intelligence Platform")
 
 st.markdown(
-"""
+    """
 Welcome to the Strategic Decision Intelligence Platform.
 
 This platform collects startup news, extracts business events,

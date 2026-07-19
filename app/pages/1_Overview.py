@@ -59,31 +59,18 @@ st.divider()
 c1, c2, c3, c4 = st.columns(4)
 
 with c1:
-    metric_card(
-        "Business Events",
-        summary["total_events"]
-    )
+    metric_card("Business Events", summary["total_events"])
 
 with c2:
-    metric_card(
-        "Companies",
-        summary["total_companies"]
-    )
+    metric_card("Companies", summary["total_companies"])
 
 with c3:
-
     funding_value = summary["total_funding"]
 
-    metric_card(
-        "Funding",
-        f"${funding_value:,.0f}"
-    )
+    metric_card("Funding", f"${funding_value:,.0f}")
 
 with c4:
-    metric_card(
-        "Avg Confidence",
-        f"{summary['avg_confidence']:.2f}"
-    )
+    metric_card("Avg Confidence", f"{summary['avg_confidence']:.2f}")
 
 st.divider()
 
@@ -96,7 +83,6 @@ left, right = st.columns([2, 1])
 # -------------------------------------------------------
 
 with left:
-
     st.subheader("🏆 Top Companies")
 
     show_dataframe(companies)
@@ -110,17 +96,12 @@ with left:
 # -------------------------------------------------------
 
 with right:
-
     st.subheader("📊 Event Distribution")
 
     fig = event_distribution_chart(distribution)
 
     if fig:
-
-        st.plotly_chart(
-            fig,
-            use_container_width=True
-        )
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("")
 

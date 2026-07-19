@@ -2,9 +2,10 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
+
 class Settings(BaseSettings):
     """Central configuration using Pydantic Settings."""
-    
+
     # Project
     PROJECT_NAME: str = "Strategic Decision Intelligence Platform"
     VERSION: str = "1.0.0"
@@ -37,16 +38,15 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
-    
+
     # RSS Sources
     GOOGLE_NEWS_RSS: str = (
         "https://news.google.com/rss/search?q=Indian+startup&hl=en-IN&gl=IN&ceid=IN:en"
     )
 
     model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore"
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
     )
+
 
 Config = Settings()

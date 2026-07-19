@@ -12,9 +12,10 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 def seed_database_if_empty():
     repo = Repository()
-    
+
     # Check if we already have companies
     repo.db.execute("SELECT COUNT(*) as count FROM companies")
     row = repo.db.fetchone()
@@ -28,26 +29,31 @@ def seed_database_if_empty():
     today = now.strftime("%Y-%m-%d")
 
     # 1. Seed Market Snapshot
-    repo.save_market_snapshot(today, {
-        "funding_amount": 1250000000,
-        "hiring_events": 45,
-        "layoff_events": 12,
-        "expansion_events": 8,
-        "acquisition_events": 3,
-        "total_events": 215,
-        "market_health": 78.5
-    })
+    repo.save_market_snapshot(
+        today,
+        {
+            "funding_amount": 1250000000,
+            "hiring_events": 45,
+            "layoff_events": 12,
+            "expansion_events": 8,
+            "acquisition_events": 3,
+            "total_events": 215,
+            "market_health": 78.5,
+        },
+    )
 
     # 2. Seed Executive Brief
-    repo.save_executive_brief({
-        "market_health_score": 78.5,
-        "investment_climate": "Favorable",
-        "risk_level": "Medium",
-        "growth_outlook": "Accelerating",
-        "strategic_summary": "The startup ecosystem is showing strong resilience with increased Series B funding rounds across AI and CleanTech sectors.",
-        "confidence_score": 0.85,
-        "primary_recommendation": "Increase allocation to AI infrastructure startups showing high momentum and low regulatory risk."
-    })
+    repo.save_executive_brief(
+        {
+            "market_health_score": 78.5,
+            "investment_climate": "Favorable",
+            "risk_level": "Medium",
+            "growth_outlook": "Accelerating",
+            "strategic_summary": "The startup ecosystem is showing strong resilience with increased Series B funding rounds across AI and CleanTech sectors.",
+            "confidence_score": 0.85,
+            "primary_recommendation": "Increase allocation to AI infrastructure startups showing high momentum and low regulatory risk.",
+        }
+    )
 
     # 3. Seed Companies & History
     class DummyCompany:
@@ -65,7 +71,7 @@ def seed_database_if_empty():
             influence_score=75.0,
             business_health=90.0,
             total_funding=45000000,
-            recommendation="Strong Buy"
+            recommendation="Strong Buy",
         ),
         DummyCompany(
             company_name="EcoStream AI",
@@ -76,7 +82,7 @@ def seed_database_if_empty():
             influence_score=65.0,
             business_health=85.0,
             total_funding=12000000,
-            recommendation="Buy"
+            recommendation="Buy",
         ),
         DummyCompany(
             company_name="DataFlow Systems",
@@ -87,17 +93,17 @@ def seed_database_if_empty():
             influence_score=40.0,
             business_health=35.0,
             total_funding=85000000,
-            recommendation="Sell"
-        )
+            recommendation="Sell",
+        ),
     ]
-    
+
     for c in companies:
         repo.save_company(c)
         # Seed 5 days of history for sparklines
         for i in range(5):
-            d = (now - timedelta(days=4-i)).strftime("%Y-%m-%d")
+            d = (now - timedelta(days=4 - i)).strftime("%Y-%m-%d")
             base = c.momentum_score
-            val = base - (4-i)*2 + (i%2)*3 # just some jitter
+            val = base - (4 - i) * 2 + (i % 2) * 3  # just some jitter
             repo.save_company_history(c.company_name, d, val, 10 + i)
 
     # 4. Seed Events
@@ -118,7 +124,7 @@ def seed_database_if_empty():
             ai_summary="Nexus Robotics secured $45M in Series B funding led by Sequoia to expand their AI manufacturing capabilities.",
             business_impact="Will accelerate go-to-market for their new autonomous factory line.",
             risk_tags='["Execution Risk"]',
-            opportunity_tags='["Market Expansion", "Product Innovation"]'
+            opportunity_tags='["Market Expansion", "Product Innovation"]',
         ),
         DummyEvent(
             company="EcoStream AI",
@@ -131,7 +137,7 @@ def seed_database_if_empty():
             ai_summary="EcoStream AI launched a real-time carbon tracking API aimed at enterprise customers.",
             business_impact="Expected to drive 40% increase in recurring revenue.",
             risk_tags='["Integration Complexity"]',
-            opportunity_tags='["B2B Sales"]'
+            opportunity_tags='["B2B Sales"]',
         ),
         DummyEvent(
             company="DataFlow Systems",
@@ -144,15 +150,16 @@ def seed_database_if_empty():
             ai_summary="DataFlow Systems announced a 15% reduction in force as part of a major restructuring effort.",
             business_impact="Signals significant cash flow issues and operational scaling failures.",
             risk_tags='["Cash Runway", "Talent Drain"]',
-            opportunity_tags='[]'
-        )
+            opportunity_tags="[]",
+        ),
     ]
-    
+
     for e in events:
         repo.save_event(e, article_id=None)
-        
+
     repo.close()
     logger.info("Database seeding complete.")
+
 
 if __name__ == "__main__":
     SchemaManager().create_tables()

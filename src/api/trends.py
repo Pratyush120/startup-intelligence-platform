@@ -6,27 +6,30 @@ from src.database.repository import Repository
 
 router = APIRouter(tags=["Trends"])
 
+
 @router.get("/trends", response_model=StandardResponse[List[dict[str, Any]]])
 async def get_trends(repo: Repository = Depends(get_repository)):
     # Calculate macro trends from DB or return mocks
     # This was previously mocked in the frontend
-    
+
     # We can calculate simple sector momentum
     repo.db.execute(
         "SELECT sector, AVG(momentum_score) as avg_momentum, COUNT(company_id) as entity_count FROM companies WHERE sector IS NOT NULL GROUP BY sector ORDER BY avg_momentum DESC LIMIT 5"
     )
     rows = repo.db.fetchall()
-    
+
     trends = []
     for idx, r in enumerate(rows):
-        trends.append({
-            "id": f"t_{idx}",
-            "name": f"{r['sector']} Momentum",
-            "velocity": round(r["avg_momentum"], 1),
-            "sector": r["sector"],
-            "topEntityIds": []
-        })
-        
+        trends.append(
+            {
+                "id": f"t_{idx}",
+                "name": f"{r['sector']} Momentum",
+                "velocity": round(r["avg_momentum"], 1),
+                "sector": r["sector"],
+                "topEntityIds": [],
+            }
+        )
+
     if not trends:
         # Fallback if no companies are categorized
         trends = [
@@ -35,8 +38,8 @@ async def get_trends(repo: Repository = Depends(get_repository)):
                 "name": "AI Infrastructure",
                 "velocity": 14.5,
                 "sector": "AI",
-                "topEntityIds": []
+                "topEntityIds": [],
             }
         ]
-        
+
     return success_response(data=trends)

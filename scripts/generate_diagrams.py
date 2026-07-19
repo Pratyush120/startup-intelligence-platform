@@ -103,8 +103,9 @@ graph TD
     
     Cron[System Cron] -->|Run pipeline.py| B
     B -->|API Calls| OpenAI[OpenAI API]
-"""
+""",
 }
+
 
 def generate_svgs():
     os.makedirs("assets/diagrams", exist_ok=True)
@@ -114,12 +115,12 @@ def generate_svgs():
             b64_str = base64.b64encode(code.strip().encode("utf-8")).decode("utf-8")
             # Create the URL
             url = f"https://mermaid.ink/svg/{b64_str}"
-            
+
             # Fetch the SVG
-            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
             with urllib.request.urlopen(req) as response:
-                svg_data = response.read().decode('utf-8')
-            
+                svg_data = response.read().decode("utf-8")
+
             # Save the SVG
             file_path = f"assets/diagrams/{name}.svg"
             with open(file_path, "w", encoding="utf-8") as f:
@@ -127,6 +128,7 @@ def generate_svgs():
             print(f"Generated {file_path}")
         except Exception as e:
             print(f"Failed to generate {name}: {e}")
+
 
 if __name__ == "__main__":
     generate_svgs()

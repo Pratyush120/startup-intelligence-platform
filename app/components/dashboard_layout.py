@@ -49,41 +49,23 @@ def render_dashboard(data):
     left, right = st.columns(2)
 
     with left:
-
         fig = momentum_chart(companies)
 
         if fig:
-
-            st.plotly_chart(
-
-                fig,
-
-                use_container_width=True
-
-            )
+            st.plotly_chart(fig, use_container_width=True)
 
     with right:
-
         fig = event_distribution(distribution)
 
         if fig:
-
-            st.plotly_chart(
-
-                fig,
-
-                use_container_width=True
-
-            )
+            st.plotly_chart(fig, use_container_width=True)
 
     st.divider()
 
-    left, right = st.columns([1,2])
+    left, right = st.columns([1, 2])
 
     with left:
-
         render_leaderboard(companies)
 
     with right:
-
         render_news_feed(events)

@@ -13,15 +13,15 @@ def render_executive_brief(summary):
 
 Funding activity remains positive.
 
-The platform detected **{summary['total_events']}**
+The platform detected **{summary["total_events"]}**
 
 business events involving
 
-**{summary['total_companies']} companies**.
+**{summary["total_companies"]} companies**.
 
 Overall confidence remains high
 
-at **{summary['avg_confidence']}**.
+at **{summary["avg_confidence"]}**.
 
 Investment sentiment remains positive.
 """

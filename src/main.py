@@ -37,6 +37,7 @@ app = FastAPI(
 # ruff: noqa: E402
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Running database migrations...")
@@ -46,6 +47,7 @@ async def lifespan(app: FastAPI):
     seed_database_if_empty()
     yield
     logger.info("Shutting down...")
+
 
 app.router.lifespan_context = lifespan
 
@@ -61,6 +63,7 @@ app.add_middleware(
 
 # 2. GZip Middleware for performance
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 
 # 3. Simple In-Memory Rate Limiting
 class RateLimiter:

@@ -12,7 +12,6 @@ def render_market_pulse(summary):
     col1, col2 = st.columns(2)
 
     with col1:
-
         st.success("Funding Activity")
 
         st.write("🟢 Strong")
@@ -22,7 +21,6 @@ def render_market_pulse(summary):
         st.write("🟢 Growing")
 
     with col2:
-
         st.warning("Layoffs")
 
         st.write("🟡 Stable")
