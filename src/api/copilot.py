@@ -37,7 +37,7 @@ async def chat_copilot(
         # Query the database to find actual matching intelligence
         companies = repo.search_entities(request.prompt, limit=3)
         events = repo.search_events(request.prompt, limit=5)
-        
+
         if not companies and not events:
             return success_response(
                 data=CopilotResponse(
@@ -45,20 +45,22 @@ async def chat_copilot(
                     content=f"I couldn't find any specific intelligence on '{request.prompt}' in our current database. Please try another query or run the pipeline to gather more data.",
                 ).model_dump()
             )
-            
+
         # Build context from database results
         context_lines = []
         if companies:
-            context_lines.append(f"Matching Companies:")
+            context_lines.append("Matching Companies:")
             for c in companies:
-                context_lines.append(f"- {c['company_name']} (Health: {c.get('business_health', 0)}, Momentum: {c.get('momentum_score', 0)})")
+                context_lines.append(
+                    f"- {c['company_name']} (Health: {c.get('business_health', 0)}, Momentum: {c.get('momentum_score', 0)})"
+                )
         if events:
-            context_lines.append(f"\nRecent Events:")
+            context_lines.append("\nRecent Events:")
             for e in events:
                 context_lines.append(f"- {e['title']}")
-                
+
         context_str = "\n".join(context_lines)
-        
+
         # Analyze using the LLM/Heuristic provider
         analysis = analyzer.analyze(
             title=request.prompt,

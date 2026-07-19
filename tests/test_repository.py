@@ -5,6 +5,7 @@ from src.analytics.company_engine import CompanyIntelligence
 from src.database.repository import repo_cache
 import subprocess
 
+
 @pytest.fixture
 def repo():
     # Make sure tables exist

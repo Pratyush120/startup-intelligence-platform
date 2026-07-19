@@ -77,8 +77,9 @@ def test_pipeline_run_endpoint(mock_delay):
     # Mock the return value of delay() which returns an AsyncResult
     class MockResult:
         id = "mock_task_id"
+
     mock_delay.return_value = MockResult()
-    
+
     response = client.post("/api/v1/pipeline/run")
     assert response.status_code == 200
     data = response.json()

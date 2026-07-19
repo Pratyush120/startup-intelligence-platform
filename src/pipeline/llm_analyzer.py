@@ -46,12 +46,12 @@ class MockProvider(LLMProvider):
     ) -> LLMAnalysis:
         start = time.time()
         time.sleep(0.01)
-        
+
         # Heuristic fallback when no LLM API key is present
         summary = description[:300] + "..." if len(description) > 300 else description
         if not summary:
             summary = title
-            
+
         impact_keywords = ["revenue", "growth", "layoff", "acquire", "funding"]
         impact = f"Potential impact on {company}'s market trajectory."
         for kw in impact_keywords:

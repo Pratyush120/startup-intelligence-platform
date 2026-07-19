@@ -161,7 +161,7 @@ def seed_database_if_empty():
     logger.info("Database seeding complete.")
 
 
-import subprocess
+import subprocess  # noqa: E402
 
 if __name__ == "__main__":
     subprocess.run(["alembic", "upgrade", "head"], check=True)
