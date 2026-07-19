@@ -10,6 +10,11 @@ interface UIState {
   toggleSearch: () => void;
   openSearch: () => void;
   closeSearch: () => void;
+
+  isCompareOpen: boolean;
+  toggleCompare: () => void;
+  openCompare: () => void;
+  closeCompare: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -22,4 +27,9 @@ export const useUIStore = create<UIState>((set) => ({
   toggleSearch: () => set((state) => ({ isSearchOpen: !state.isSearchOpen })),
   openSearch: () => set({ isSearchOpen: true }),
   closeSearch: () => set({ isSearchOpen: false }),
+
+  isCompareOpen: false,
+  toggleCompare: () => set((state) => ({ isCompareOpen: !state.isCompareOpen })),
+  openCompare: () => set({ isCompareOpen: true }),
+  closeCompare: () => set({ isCompareOpen: false }),
 }));

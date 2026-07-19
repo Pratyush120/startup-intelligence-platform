@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { X, Sparkles, TrendingUp, ShieldAlert, Target, Info, ShieldCheck, ArrowRight, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useUIStore } from "@/store/ui.store";
+import { useRouter } from "next/navigation";
 
 interface AIDecisionCanvasProps {
   isOpen: boolean;
@@ -20,6 +22,8 @@ interface AIDecisionCanvasProps {
 
 export function AIDecisionCanvas({ isOpen, onClose, entityName, data }: AIDecisionCanvasProps) {
   const [mounted, setMounted] = useState(false);
+  const { openCompare } = useUIStore();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -143,7 +147,10 @@ export function AIDecisionCanvas({ isOpen, onClose, entityName, data }: AIDecisi
                 <section>
                    <h3 className="text-sm font-mono uppercase tracking-wider text-secondary mb-4">Suggested Next Actions</h3>
                    <div className="space-y-3">
-                      <button className="w-full flex items-center justify-between p-4 rounded-xl border border-border-default bg-surface-2 hover:bg-surface-3 transition-colors text-left group">
+                      <button 
+                         onClick={() => { onClose(); router.push('/reports'); }}
+                         className="w-full flex items-center justify-between p-4 rounded-xl border border-border-default bg-surface-2 hover:bg-surface-3 transition-colors text-left group"
+                      >
                          <div>
                             <div className="text-sm font-medium text-primary">Generate Brief</div>
                             <div className="text-xs text-secondary mt-1">Export full analyst report</div>
@@ -151,7 +158,10 @@ export function AIDecisionCanvas({ isOpen, onClose, entityName, data }: AIDecisi
                          <ArrowRight className="w-4 h-4 text-tertiary group-hover:text-primary transition-colors" />
                       </button>
                       
-                      <button className="w-full flex items-center justify-between p-4 rounded-xl border border-border-default bg-surface-2 hover:bg-surface-3 transition-colors text-left group">
+                      <button 
+                         onClick={() => { onClose(); openCompare(); }}
+                         className="w-full flex items-center justify-between p-4 rounded-xl border border-border-default bg-surface-2 hover:bg-surface-3 transition-colors text-left group"
+                      >
                          <div>
                             <div className="text-sm font-medium text-primary">Compare Competitors</div>
                             <div className="text-xs text-secondary mt-1">Map against market leaders</div>

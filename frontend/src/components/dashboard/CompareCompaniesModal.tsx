@@ -5,18 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, GitCompare, Loader2, Building2, TrendingUp, AlertTriangle, Activity } from "lucide-react";
 import { useTopCompanies } from "@/hooks/use-intelligence";
 import { CompanyMetric } from "@/lib/types/executive";
+import { useUIStore } from "@/store/ui.store";
 
-interface CompareCompaniesModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModalProps) {
+export function CompareCompaniesModal() {
+  const { isCompareOpen, closeCompare } = useUIStore();
   const { data: companies, isLoading } = useTopCompanies();
   const [selectedCompany1, setSelectedCompany1] = useState<string>("");
   const [selectedCompany2, setSelectedCompany2] = useState<string>("");
 
-  if (!isOpen) return null;
+  if (!isCompareOpen) return null;
 
   const company1 = companies?.find(c => c.name === selectedCompany1) || null;
   const company2 = companies?.find(c => c.name === selectedCompany2) || null;
@@ -55,7 +52,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-base/80 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={closeCompare}
         />
         
         <motion.div
@@ -75,7 +72,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
               </div>
             </div>
             <button
-              onClick={onClose}
+              onClick={closeCompare}
               className="p-2 rounded-lg hover:bg-surface-2 text-tertiary hover:text-primary transition-colors"
             >
               <X className="w-5 h-5" />

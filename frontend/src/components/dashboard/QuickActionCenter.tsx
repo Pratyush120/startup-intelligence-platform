@@ -7,11 +7,12 @@ import { useRunPipeline } from "@/hooks/use-intelligence";
 import { useState } from "react";
 import { CompareCompaniesModal } from "./CompareCompaniesModal";
 import { toast } from "sonner";
+import { useUIStore } from "@/store/ui.store";
 
 export function QuickActionCenter() {
   const router = useRouter();
   const runPipelineMutation = useRunPipeline();
-  const [isCompareOpen, setIsCompareOpen] = useState(false);
+  const { openSearch, openCompare } = useUIStore();
 
   const handleAction = (id: string) => {
     switch (id) {
@@ -19,7 +20,7 @@ export function QuickActionCenter() {
         router.push('/reports');
         break;
       case 'compare':
-        setIsCompareOpen(true);
+        openCompare();
         break;
       case 'refresh':
         toast("Pipeline triggered", { description: "Data ingestion process has started in the background." });
@@ -29,11 +30,22 @@ export function QuickActionCenter() {
         });
         break;
       case 'export':
-        window.print();
+        {
+          const content = "Startup Intelligence Platform\n============================\n\nExecutive Market Brief\n\nGenerated: " + new Date().toLocaleString() + "\n\nThis is an automated export of the current intelligence metrics.";
+          const blob = new Blob([content], { type: "text/plain" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "executive_brief.txt";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          toast.success("Document exported successfully");
+        }
         break;
       case 'analyze':
-        // Trigger command palette to search
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+        openSearch();
         break;
       case 'market':
         router.push('/market');
@@ -45,7 +57,7 @@ export function QuickActionCenter() {
     { id: 'report', label: 'Generate Report', icon: FileText, shortcut: '⌘R' },
     { id: 'compare', label: 'Compare Companies', icon: GitCompare, shortcut: '⌘C' },
     { id: 'refresh', label: 'Refresh Intelligence', icon: RefreshCw, shortcut: '⌘⇧R' },
-    { id: 'export', label: 'Export PDF', icon: Download, shortcut: '⌘E' },
+    { id: 'export', label: 'Export Document', icon: Download, shortcut: '⌘E' },
     { id: 'analyze', label: 'Analyze Entity', icon: Search, shortcut: '⌘F' },
     { id: 'market', label: 'View Market', icon: LineChart, shortcut: '⌘M' },
   ];
@@ -69,7 +81,7 @@ export function QuickActionCenter() {
         ))}
       </div>
     </section>
-      <CompareCompaniesModal isOpen={isCompareOpen} onClose={() => setIsCompareOpen(false)} />
+      <CompareCompaniesModal />
     </>
   );
 }

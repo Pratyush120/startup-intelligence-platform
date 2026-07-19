@@ -14,9 +14,10 @@ import { Compass, Target, Server, FileText, ArrowRight, Loader2, Activity } from
 import { useRouter } from "next/navigation"
 import { useTopCompanies, useSearch } from "@/hooks/use-intelligence"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useUIStore } from "@/store/ui.store"
 
 export function OmniSearchDialog() {
-  const [open, setOpen] = React.useState(false)
+  const { isSearchOpen, closeSearch, toggleSearch } = useUIStore()
   const [query, setQuery] = React.useState("")
   const debouncedQuery = useDebounce(query, 300)
   const router = useRouter()
@@ -28,7 +29,7 @@ export function OmniSearchDialog() {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        toggleSearch()
       }
     }
     document.addEventListener("keydown", down)
@@ -36,16 +37,16 @@ export function OmniSearchDialog() {
   }, [])
 
   const runCommand = React.useCallback((command: () => void) => {
-    setOpen(false)
+    closeSearch()
     command()
-  }, [])
+  }, [closeSearch])
 
   const isQuerying = debouncedQuery.length >= 2;
   const companies = isQuerying ? searchResults?.companies : topCompanies;
   const events = searchResults?.events || [];
 
   return (
-    <CommandDialog open={open} onOpenChange={setOpen}>
+    <CommandDialog open={isSearchOpen} onOpenChange={(open) => !open && closeSearch()}>
       <CommandInput 
         placeholder="Search intelligence, entities, or commands..." 
         className="font-sans" 

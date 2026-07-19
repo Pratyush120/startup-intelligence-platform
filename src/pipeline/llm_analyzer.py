@@ -148,6 +148,68 @@ CONFIDENCE: [0.0-1.0 float]"""
         )
 
 
+class FreeLLMProvider(LLMProvider):
+    def analyze(
+        self, title: str, description: str, event_type: str, company: str
+    ) -> LLMAnalysis:
+        start = time.time()
+        safe_title = title[:200].replace("\n", " ")
+        safe_desc = description[:400].replace("\n", " ")
+
+        prompt = f"""You are a senior investment analyst. Analyze this startup news event.
+
+Company: {company}
+Event Type: {event_type}
+Headline: {safe_title}
+Details: {safe_desc}
+
+Respond in this exact format (no markdown, one line per field):
+SUMMARY: [1-2 sentence executive summary]
+IMPACT: [1 sentence business impact]
+RECOMMATION: [1 sentence strategic recommendation]
+RISK: [1 sentence identifying key risk]
+OPPORTUNITY: [1 sentence identifying key opportunity]
+INSIGHT: [1 sentence key insight]
+CONFIDENCE: [0.0-1.0 float]"""
+
+        try:
+            from g4f.client import Client
+            client = Client()
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = response.choices[0].message.content or ""
+        except Exception as e:
+            logger.error(f"FreeLLM API error: {e}")
+            raise
+
+        lines = {}
+        for line in text.strip().split("\n"):
+            if ":" in line:
+                key, _, val = line.partition(":")
+                lines[key.strip().upper()] = val.strip()
+
+        try:
+            confidence = float(lines.get("CONFIDENCE", "0.75"))
+            confidence = max(0.0, min(1.0, confidence))
+        except ValueError:
+            confidence = 0.75
+
+        return LLMAnalysis(
+            executive_summary=lines.get("SUMMARY", "")[:300],
+            business_impact=lines.get("IMPACT", "")[:200],
+            strategic_recommendation=lines.get("RECOMMATION", "")[:200],
+            risk=lines.get("RISK", "")[:200],
+            opportunity=lines.get("OPPORTUNITY", "")[:200],
+            key_insight=lines.get("INSIGHT", "")[:200],
+            confidence=confidence,
+            prompt_version="freellm_v1",
+            token_usage=0,
+            processing_time_ms=int((time.time() - start) * 1000),
+        )
+
+
 class LLMAnalyzer:
     def __init__(self, provider: Optional[LLMProvider] = None):
         if provider is None:
@@ -157,13 +219,13 @@ class LLMAnalyzer:
                     logger.info("LLMAnalyzer: Initialized with OpenAIProvider")
                 except Exception as e:
                     logger.warning(
-                        f"Failed to init OpenAIProvider: {e}. Falling back to MockProvider"
+                        f"Failed to init OpenAIProvider: {e}. Falling back to FreeLLMProvider"
                     )
-                    self.provider = MockProvider()
+                    self.provider = FreeLLMProvider()
             else:
-                self.provider = MockProvider()
+                self.provider = FreeLLMProvider()
                 logger.info(
-                    "LLMAnalyzer: Initialized with MockProvider (No API key found)"
+                    "LLMAnalyzer: Initialized with FreeLLMProvider (No API key found)"
                 )
         else:
             self.provider = provider
