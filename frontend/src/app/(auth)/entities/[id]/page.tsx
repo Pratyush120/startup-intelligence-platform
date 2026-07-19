@@ -95,79 +95,46 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
         
         <TabsContent value="overview" className="mt-8 space-y-8">
           
-          {/* Executive Overview Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-3 space-y-6">
-               <Card className="bg-card">
-                 <CardHeader>
-                   <CardTitle className="text-sm font-mono text-muted-foreground uppercase flex items-center gap-2">
-                     <Star className="w-4 h-4 text-primary" /> AI Strategy Analysis
-                   </CardTitle>
-                 </CardHeader>
-                 <CardContent>
-                   <p className="text-lg leading-relaxed text-foreground">
-                     {entity.recommendation || "Monitoring required to generate strategic recommendation."}
-                   </p>
-                   <div className="mt-4 p-4 bg-muted/20 border border-border rounded-md">
-                      <h4 className="text-sm font-semibold mb-2">Why this matters</h4>
-                      <p className="text-sm text-muted-foreground">
-                        The current growth score of {entity.growthScore} and momentum of {entity.momentum} indicates a {entity.trendDirection} trajectory. 
-                        Combined with a risk score of {entity.riskScore}, this implies significant business implications for competitors in the sector.
-                      </p>
-                   </div>
-                 </CardContent>
-               </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card className="bg-card">
+              <CardHeader>
+                <CardTitle className="text-sm font-mono text-muted-foreground uppercase">AI Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm leading-relaxed">
+                  {entity.recommendation || "No strategic recommendation available for this entity at this time."}
+                </p>
+                <div className="mt-6 space-y-4">
+                  <div className="flex justify-between items-center text-sm border-b border-border pb-2">
+                    <span className="text-muted-foreground">Funding Total</span>
+                    <span className="font-medium font-mono">${(entity.fundingTotal / 1000000).toFixed(1)}M</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm border-b border-border pb-2">
+                    <span className="text-muted-foreground">Growth Score</span>
+                    <span className="font-medium font-mono">{entity.growthScore}/100</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 <div className="p-4 bg-card border border-border rounded-lg">
-                   <div className="text-xs font-mono text-muted-foreground uppercase mb-1">Latest Funding</div>
-                   <div className="text-2xl font-bold">${(entity.fundingTotal / 1000000).toFixed(1)}M</div>
-                   <div className="text-xs text-signal-positive mt-1">+12% vs previous round</div>
-                 </div>
-                 <div className="p-4 bg-card border border-border rounded-lg">
-                   <div className="text-xs font-mono text-muted-foreground uppercase mb-1">Est. Valuation</div>
-                   <div className="text-2xl font-bold">${((entity.fundingTotal * 8) / 1000000).toFixed(1)}M</div>
-                   <div className="text-xs text-muted-foreground mt-1">Based on market multiples</div>
-                 </div>
-                 <div className="p-4 bg-card border border-border rounded-lg">
-                   <div className="text-xs font-mono text-muted-foreground uppercase mb-1">Hiring Trend</div>
-                   <div className="text-2xl font-bold text-signal-positive">Accelerating</div>
-                   <div className="text-xs text-muted-foreground mt-1">15 open executive roles</div>
-                 </div>
-               </div>
-            </div>
-
-            <div className="space-y-4">
-               <div className="p-4 bg-muted/10 border border-border rounded-lg space-y-4">
-                  <h3 className="text-sm font-semibold border-b border-border pb-2">Company Profile</h3>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Industry</div>
-                    <div className="text-sm font-medium">Artificial Intelligence</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Founding Year</div>
-                    <div className="text-sm font-medium">2019</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Employees</div>
-                    <div className="text-sm font-medium">500 - 1,000</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-1">Headquarters</div>
-                    <div className="text-sm font-medium">San Francisco, CA</div>
-                  </div>
-               </div>
-               
-               <div className="p-4 bg-card border border-signal-danger/30 rounded-lg">
-                  <div className="text-xs font-mono text-signal-danger uppercase mb-1 flex items-center gap-2">
-                    <ShieldAlert className="w-3 h-3" /> Risk Level
-                  </div>
-                  <div className="text-xl font-bold text-signal-danger">
+            <Card className="bg-card">
+              <CardHeader>
+                <CardTitle className="text-sm font-mono text-muted-foreground uppercase flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-signal-danger" />
+                  Competitive Threat Level
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="text-2xl font-semibold tracking-tight uppercase text-signal-danger">
                     {entity.riskScore > 75 ? "Critical" : entity.riskScore > 50 ? "High" : "Moderate"}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">Score: {entity.riskScore}/100</div>
-               </div>
-            </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Risk score computed as {entity.riskScore}/100 based on recent pipeline analysis.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
         </TabsContent>

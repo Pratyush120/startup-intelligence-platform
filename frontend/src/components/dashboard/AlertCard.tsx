@@ -1,13 +1,17 @@
 "use client";
 
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { StrategicAlert } from "@/lib/types/executive";
-import { AlertTriangle, AlertCircle, Info } from "lucide-react";
+import { ChevronDown, AlertTriangle, AlertCircle, Info } from "lucide-react";
 
 interface AlertCardProps {
   alert: StrategicAlert;
 }
 
 export function AlertCard({ alert }: AlertCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
   const getPriorityColor = (priority: StrategicAlert["priority"]) => {
     switch (priority) {
       case "Critical": return "bg-signal-danger text-signal-danger-subtle";
@@ -29,50 +33,72 @@ export function AlertCard({ alert }: AlertCardProps) {
   };
 
   return (
-    <div
-      className="w-full text-left group border border-border bg-card/40 backdrop-blur-sm rounded-xl p-5 hover:border-primary/50 transition-colors flex flex-col gap-4 shadow-sm"
+    <motion.button
+      layout
+      onClick={() => setExpanded(!expanded)}
+      className="w-full text-left group border border-border-default bg-base rounded-md p-4 md:p-5 hover:border-border-strong transition-colors focus-visible:ring-2 focus-visible:ring-focus outline-none flex flex-col gap-3"
+      aria-expanded={expanded}
     >
       <div className="flex items-start justify-between w-full gap-4">
         <div className="flex items-start gap-3 flex-1">
-          <div className="mt-1 shrink-0 bg-background rounded-full p-1.5 border border-border">
+          <div className="mt-0.5 shrink-0">
             <PriorityIcon priority={alert.priority} />
           </div>
           <div>
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="text-xs font-bold tracking-wide uppercase px-2 py-0.5 rounded-full bg-muted/50 border border-border text-foreground">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <span className="caption-sm text-primary font-medium tracking-wide uppercase px-2 py-0.5 rounded-sm bg-surface-2">
                 {alert.companyName}
               </span>
-              <span className="text-xs text-muted-foreground uppercase font-mono tracking-wider">
+              <span className="caption-sm text-secondary">
                 {alert.category}
               </span>
-              <span className="text-xs text-muted-foreground font-mono hidden sm:inline-block">
+              <span className="caption-sm text-tertiary hidden sm:inline-block">
                 • {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             </div>
-            <h3 className="text-lg font-semibold text-foreground leading-snug pr-4">{alert.title}</h3>
+            <h3 className="heading-sm text-primary leading-snug pr-4">{alert.title}</h3>
           </div>
         </div>
+        
+        <motion.div 
+          animate={{ rotate: expanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="shrink-0 text-tertiary group-hover:text-primary transition-colors"
+        >
+          <ChevronDown className="w-5 h-5" />
+        </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-2">
-        <div className="p-4 bg-muted/20 border border-border/50 rounded-lg">
-          <h4 className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2">Why this matters</h4>
-          <p className="text-sm text-foreground leading-relaxed">{alert.impact}</p>
-        </div>
-        <div className="p-4 bg-primary/5 border border-primary/20 rounded-lg">
-          <h4 className="text-xs font-mono text-primary uppercase tracking-wider mb-2 flex items-center gap-2">
-            Suggested Action
-          </h4>
-          <p className="text-sm text-foreground font-medium">{alert.recommendation}</p>
-        </div>
-      </div>
-      
-      <div className="flex items-center justify-between text-xs mt-2 border-t border-border pt-4">
-        <span className="text-muted-foreground font-mono">AI Confidence: {alert.confidence}%</span>
-        <span className={`px-2 py-1 rounded-sm ${getPriorityColor(alert.priority)} font-mono uppercase font-bold tracking-wider text-[10px]`}>
-          Priority: {alert.priority}
-        </span>
-      </div>
-    </div>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: "easeInOut" }}
+            className="overflow-hidden w-full"
+          >
+            <div className="pt-2 pb-1 border-t border-border-default mt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                <div>
+                  <span className="caption-sm text-tertiary uppercase tracking-wider block mb-1">Business Impact</span>
+                  <p className="body-sm text-secondary">{alert.impact}</p>
+                </div>
+                <div>
+                  <span className="caption-sm text-tertiary uppercase tracking-wider block mb-1">Suggested Action</span>
+                  <p className="body-sm text-primary font-medium">{alert.recommendation}</p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between text-xs">
+                <span className="text-secondary font-mono">Confidence: {alert.confidence}%</span>
+                <span className={`px-2 py-1 rounded-sm ${getPriorityColor(alert.priority)} font-mono uppercase font-bold tracking-wider`}>
+                  {alert.priority}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.button>
   );
 }
