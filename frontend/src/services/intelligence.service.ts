@@ -104,21 +104,9 @@ export const IntelligenceService = {
   },
 
   getStrategicAlerts: async (): Promise<StrategicAlert[]> => {
-    // Derive alerts from top timeline events or recommendations for now
     try {
-      const response = await apiClient.get(ENDPOINTS.EVENTS);
-      const events = response.data.data as TimelineEvent[];
-      return events.filter(e => e.importance === 'Critical' || e.importance === 'High').map(e => ({
-        id: e.id,
-        title: e.eventType,
-        impact: e.businessImpact,
-        confidence: 90,
-        companyName: e.companyName,
-        category: e.eventType as any,
-        recommendation: e.aiSummary,
-        timestamp: e.date,
-        priority: e.importance
-      }));
+      const response = await apiClient.get(ENDPOINTS.STRATEGIC_ALERTS);
+      return response.data.data;
     } catch (e) {
       console.error(e);
       return [];
@@ -188,40 +176,18 @@ export const IntelligenceService = {
   },
 
   getTrends: async (): Promise<MacroTrend[]> => {
-    // We derive trends from market snapshots
     try {
-      const response = await apiClient.get(ENDPOINTS.MARKET_SNAPSHOT);
-      const snapshots = response.data.data as MarketSnapshot[];
-      return [
-        {
-          id: "t1",
-          name: "AI Infrastructure",
-          velocity: 14.5,
-          sector: "AI",
-          topEntityIds: []
-        }
-      ];
+      const response = await apiClient.get(ENDPOINTS.TRENDS);
+      return response.data.data;
     } catch (e) {
       return [];
     }
   },
 
   getExecutiveModules: async (): Promise<ExecutiveModuleData[]> => {
-    // Map the single executive brief to modules
     try {
-      const response = await apiClient.get(ENDPOINTS.EXECUTIVE_BRIEF);
-      const brief = response.data.data as ExecutiveBrief;
-      if (!brief) return [];
-      return [
-        {
-          id: brief.id,
-          question: "What is the strategic summary?",
-          answer: brief.strategicSummary,
-          evidence: [],
-          confidence: brief.confidenceScore,
-          action: { label: brief.primaryRecommendation, intent: "Review" }
-        }
-      ];
+      const response = await apiClient.get(ENDPOINTS.EXECUTIVE_MODULES);
+      return response.data.data;
     } catch (e) {
       return [];
     }

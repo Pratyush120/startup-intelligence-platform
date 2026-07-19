@@ -9,4 +9,7 @@ export const ENDPOINTS = {
   EXECUTIVE_BRIEF: "/executive-brief",
   PIPELINE_RUN: "/pipeline/run",
   PIPELINE_STATUS: "/pipeline/status",
+  STRATEGIC_ALERTS: "/alerts",
+  TRENDS: "/trends",
+  EXECUTIVE_MODULES: "/modules",
 } as const;

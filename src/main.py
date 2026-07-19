@@ -18,6 +18,9 @@ from src.api.timeline import router as timeline_router
 from src.api.recommendations import router as recommendations_router
 from src.api.search import router as search_router
 from src.api.pipeline import router as pipeline_router
+from src.api.alerts import router as alerts_router
+from src.api.trends import router as trends_router
+from src.api.modules import router as modules_router
 from src.utils.logger import get_logger
 from src.database.schema import SchemaManager
 from src.database.seeder import seed_database_if_empty
@@ -30,13 +33,21 @@ app = FastAPI(
     description="Strategic Decision Intelligence Platform API",
 )
 
-@app.on_event("startup")
-async def startup_event():
+# Use lifespan context manager instead of deprecated on_event
+# ruff: noqa: E402
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     logger.info("Running database migrations...")
     SchemaManager().create_tables()
     logger.info("Database migrations complete.")
     logger.info("Seeding initial data if empty...")
     seed_database_if_empty()
+    yield
+    logger.info("Shutting down...")
+
+app.router.lifespan_context = lifespan
 
 # 1. CORS middleware (Strict)
 app.add_middleware(
@@ -50,7 +61,6 @@ app.add_middleware(
 
 # 2. GZip Middleware for performance
 app.add_middleware(GZipMiddleware, minimum_size=1000)
-
 
 # 3. Simple In-Memory Rate Limiting
 class RateLimiter:
@@ -134,6 +144,9 @@ app.include_router(timeline_router, prefix="/api/v1")
 app.include_router(recommendations_router, prefix="/api/v1")
 app.include_router(search_router, prefix="/api/v1")
 app.include_router(pipeline_router, prefix="/api/v1")
+app.include_router(alerts_router, prefix="/api/v1")
+app.include_router(trends_router, prefix="/api/v1")
+app.include_router(modules_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn
