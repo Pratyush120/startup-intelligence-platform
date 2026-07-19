@@ -81,3 +81,52 @@ export interface MetricCard {
   impact?: string;
   confidence?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Pipeline
+// ---------------------------------------------------------------------------
+
+export interface PipelineStatus {
+  status: 'idle' | 'running' | 'success' | 'failed';
+  last_run?: string;
+  /** ISO timestamp of when the pipeline started */
+  startedAt?: string;
+  task_id?: string;
+  recordsProcessed?: number;
+  errors?: number;
+}
+
+export interface PipelineRunResponse {
+  success: boolean;
+  data: {
+    task_id: string;
+    message: string;
+  };
+  meta: {
+    status: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// AI Copilot
+// ---------------------------------------------------------------------------
+
+export interface CopilotMessage {
+  role: 'assistant' | 'user';
+  content: string;
+  cersr?: {
+    confidence: number;
+    evidence: string;
+    sources: string[];
+    strategy: string;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Search
+// ---------------------------------------------------------------------------
+
+export interface SearchResults {
+  companies: CompanyMetric[];
+  events: TimelineEvent[];
+}

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { RadarGraph } from "@/components/ui/radar-graph"
 import { Compass, Filter } from "lucide-react"
 import { useTrends } from "@/hooks/use-intelligence"
+import { MacroTrend } from "@/lib/types"
 
 export default function RadarPage() {
   const { data: trends, isLoading, isError } = useTrends();
@@ -68,7 +69,7 @@ export default function RadarPage() {
               </div>
             ) : isError ? (
                <div className="text-red-400 text-sm">Failed to load trends</div>
-            ) : trends?.map((trend: any) => (
+            ) : trends?.map((trend: MacroTrend) => (
               <button key={trend.id} className="w-full text-left group">
                 <Card className="border-border bg-card/40 hover:bg-accent/50 transition-colors group-focus:border-signal-intelligence">
                   <CardContent className="p-4 flex items-center justify-between">
@@ -121,7 +122,7 @@ export default function RadarPage() {
                     <tr>
                       <td colSpan={4} className="p-4 text-center text-muted-foreground">Loading...</td>
                     </tr>
-                  ) : trends?.map((trend: any) => (
+                  ) : trends?.map((trend: MacroTrend) => (
                     <tr key={trend.id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-6 py-3 font-medium">{trend.name}</td>
                       <td className="px-6 py-3 text-right font-mono text-muted-foreground">

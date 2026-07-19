@@ -77,10 +77,10 @@ export function OmniSearchDialog() {
             <CommandSeparator />
             <CommandGroup heading="Intelligence Events">
               {events.map(event => (
-                <CommandItem key={event.id} onSelect={() => runCommand(() => router.push(`/entities/${event.companyId || event.id}`))} className="cursor-pointer">
+                <CommandItem key={event.id} onSelect={() => runCommand(() => router.push(`/entities/${encodeURIComponent(event.companyName)}`))} className="cursor-pointer">
                   <Activity className="mr-2 h-4 w-4 text-muted-foreground" />
                   <div className="flex flex-col max-w-full overflow-hidden">
-                     <span className="truncate">{event.title || event.aiSummary || event.eventType}</span>
+                     <span className="truncate">{event.aiSummary || event.businessImpact || event.eventType}</span>
                      <span className="text-xs text-muted-foreground truncate">{event.companyName}</span>
                   </div>
                   <div className="ml-auto text-xs font-mono text-muted-foreground pl-4">Event</div>

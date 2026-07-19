@@ -5,11 +5,12 @@ import { X, Sparkles, Send, BookOpen, ShieldAlert, ArrowRight, ExternalLink } fr
 import { useUIStore } from "@/store/ui.store";
 import { Badge } from "@/components/ui/badge";
 import { IntelligenceService } from "@/services/intelligence.service";
+import { CopilotMessage } from "@/lib/types/executive";
 
 export function AICopilot() {
   const { isCopilotOpen, closeCopilot } = useUIStore();
   const [query, setQuery] = useState("");
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<CopilotMessage[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
   if (!isCopilotOpen) return null;

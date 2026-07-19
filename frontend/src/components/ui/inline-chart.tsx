@@ -44,8 +44,8 @@ export function InlineChart({ data, color = '#71717A', isThreat = false }: Inlin
   return (
     <div className="w-[120px] h-[40px] inline-block align-middle ml-4">
       <Plot
-        data={plotData as any}
-        layout={layout as any}
+        data={plotData}
+        layout={layout}
         config={{ displayModeBar: false, responsive: true }}
         style={{ width: '100%', height: '100%' }}
       />

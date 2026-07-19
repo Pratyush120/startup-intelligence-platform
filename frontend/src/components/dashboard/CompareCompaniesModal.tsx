@@ -21,7 +21,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
   const company1 = companies?.find(c => c.name === selectedCompany1) || null;
   const company2 = companies?.find(c => c.name === selectedCompany2) || null;
 
-  const renderMetric = (label: string, value1: any, value2: any, Icon: React.ElementType, higherIsBetter = true) => {
+  const renderMetric = (label: string, value1: number | undefined, value2: number | undefined, Icon: React.ElementType, higherIsBetter = true) => {
     let color1 = "text-primary";
     let color2 = "text-primary";
     

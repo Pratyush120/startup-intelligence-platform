@@ -7,6 +7,9 @@
 
 @layer base {
   :root {
+    --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
     /* Background */
     --color-bg-base: #FFFFFF;
     --color-bg-surface-1: #F4F4F5;

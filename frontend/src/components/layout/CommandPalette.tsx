@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search, ArrowRight, Sparkles, Building2, TrendingUp, Loader2 } from "lucide-react";
 import { useUIStore } from "@/store/ui.store";
 import { useSearch } from "@/hooks/use-intelligence";
+import { CompanyMetric } from "@/lib/types/executive";
 
 export function CommandPalette() {
   const { isSearchOpen, closeSearch } = useUIStore();
@@ -95,7 +96,11 @@ export function CommandPalette() {
                     className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left text-primary hover:bg-surface-2 transition-colors group"
                     onClick={() => {
                        setQuery(s.text);
-                       setTimeout(() => handleSearch(new Event('submit') as any), 100);
+                       // Defer to next tick so setQuery has flushed, then fire handleSearch
+                       setTimeout(() => {
+                         const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+                         handleSearch(syntheticEvent);
+                       }, 100);
                     }}
                   >
                     <div className="text-secondary group-hover:text-primary transition-colors">
@@ -116,7 +121,7 @@ export function CommandPalette() {
               ) : (searchResults?.companies && searchResults.companies.length > 0) ? (
                 <div className="space-y-2">
                   <h3 className="text-xs font-mono uppercase tracking-wider text-secondary px-2">Companies</h3>
-                  {searchResults.companies.map((company: any) => (
+                  {searchResults.companies.map((company: CompanyMetric) => (
                     <button
                       key={company.id || company.name}
                       onClick={() => handleSelectEntity(company.name)}

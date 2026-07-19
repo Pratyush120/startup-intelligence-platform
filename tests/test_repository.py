@@ -11,7 +11,9 @@ def repo():
     # Make sure tables exist
     subprocess.run(["alembic", "upgrade", "head"], check=True)
     repo_cache.cache.clear()
-    return Repository()
+    repository = Repository()
+    yield repository
+    repository.close()
 
 
 def test_repo_save_company_and_get(repo):

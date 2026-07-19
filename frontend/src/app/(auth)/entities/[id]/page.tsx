@@ -6,6 +6,7 @@ import { BusinessScore } from "@/components/ui/business-score"
 import { ShieldAlert, ExternalLink, Sparkles } from "lucide-react"
 import { useEntity, useTimeline } from "@/hooks/use-intelligence"
 import { AIDecisionCanvas } from "@/components/dashboard/AIDecisionCanvas"
+import { TimelineEvent } from "@/lib/types/executive"
 
 export default function EntityPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -29,7 +30,7 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
     confidence: entity.riskScore > 70 ? 75 : 92, // Calculate confidence based on risk
     recommendation: entity.recommendation || `Based on a growth score of ${entity.growthScore} and risk score of ${entity.riskScore}, ${entity.name} requires careful monitoring.`,
     evidence: recentEvents.length > 0 
-      ? recentEvents.slice(0, 3).map((e: any) => e.aiSummary || e.businessImpact || e.eventType)
+      ? recentEvents.slice(0, 3).map((e: TimelineEvent) => e.aiSummary || e.businessImpact || e.eventType)
       : ["No recent significant events detected in the pipeline."]
   } : undefined;
 
@@ -166,7 +167,7 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
                     <p>We're currently gathering intelligence on {entity.name}.</p>
                     <p className="text-sm mt-2 text-muted-foreground">In the meantime, explore related competitors or generate a market brief.</p>
                  </div>
-              ) : recentEvents.map((evt: any, idx: number) => (
+              ) : recentEvents.map((evt: TimelineEvent, idx: number) => (
                 <div key={evt.id} className="p-5 border border-border rounded-xl bg-surface-1 hover:border-border-strong transition-colors">
                   <div className="flex justify-between items-start gap-4">
                     <div className="space-y-2 flex-1">

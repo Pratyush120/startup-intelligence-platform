@@ -14,7 +14,11 @@ import {
   Recommendation,
   TimelineEvent,
   StrategicAlert,
-  MetricCard
+  MetricCard,
+  PipelineStatus,
+  PipelineRunResponse,
+  CopilotMessage,
+  SearchResults,
 } from "@/lib/types/executive";
 
 export const IntelligenceService = {
@@ -62,21 +66,21 @@ export const IntelligenceService = {
     }
   },
 
-  getEntity: async (id: string): Promise<any> => {
+  getEntity: async (id: string): Promise<CompanyMetric | null> => {
     try {
       const response = await apiClient.get(ENDPOINTS.ENTITY(id));
-      return response.data.data;
+      return response.data.data as CompanyMetric;
     } catch (e) {
       console.error(e);
       return null;
     }
   },
 
-  searchEntities: async (query: string): Promise<{ companies: any[], events: any[] }> => {
+  searchEntities: async (query: string): Promise<SearchResults> => {
     try {
       if (!query || query.length < 2) return { companies: [], events: [] };
       const response = await apiClient.get(`${ENDPOINTS.SEARCH}?q=${encodeURIComponent(query)}`);
-      return response.data.data;
+      return response.data.data as SearchResults;
     } catch (e) {
       console.error(e);
       return { companies: [], events: [] };
@@ -113,20 +117,20 @@ export const IntelligenceService = {
     }
   },
 
-  runPipeline: async (): Promise<any> => {
+  runPipeline: async (): Promise<PipelineRunResponse> => {
     try {
       const response = await apiClient.post(ENDPOINTS.PIPELINE_RUN);
-      return response.data;
+      return response.data as PipelineRunResponse;
     } catch (e) {
       console.error(e);
       throw e;
     }
   },
 
-  getPipelineStatus: async (): Promise<any> => {
+  getPipelineStatus: async (): Promise<PipelineStatus | null> => {
     try {
       const response = await apiClient.get(ENDPOINTS.PIPELINE_STATUS);
-      return response.data.data;
+      return response.data.data as PipelineStatus;
     } catch (e) {
       console.error(e);
       return null;
@@ -193,10 +197,10 @@ export const IntelligenceService = {
     }
   },
 
-  askCopilot: async (prompt: string): Promise<any> => {
+  askCopilot: async (prompt: string): Promise<CopilotMessage> => {
     try {
       const response = await apiClient.post(ENDPOINTS.COPILOT_CHAT, { prompt });
-      return response.data.data;
+      return response.data.data as CopilotMessage;
     } catch (e) {
       console.error(e);
       return {

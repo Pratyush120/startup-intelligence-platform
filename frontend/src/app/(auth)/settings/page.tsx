@@ -53,15 +53,15 @@ export default function SettingsPage() {
               <div className="space-y-1">
                 <div className="text-sm font-medium">Pipeline Status</div>
                 <div className="text-xs text-muted-foreground">
-                  {loadingStatus ? "Checking status..." : 
-                   status ? `Last run: ${new Date(status.startedAt).toLocaleString()}` : 
+                  {loadingStatus ? "Checking status..." :
+                   status?.startedAt ? `Last run: ${new Date(status.startedAt).toLocaleString()}` :
                    "No pipeline history found."}
                 </div>
               </div>
               <Badge variant="outline" className={`font-mono bg-transparent ${
                 isRunning ? 'text-blue-400 border-blue-400/30' : 
-                status?.status === 'error' ? 'text-signal-danger border-signal-danger/30' :
-                status?.status === 'completed' ? 'text-signal-positive border-signal-positive/30' :
+                status?.status === 'failed' ? 'text-signal-danger border-signal-danger/30' :
+                status?.status === 'success' ? 'text-signal-positive border-signal-positive/30' :
                 'text-muted-foreground border-border'
               }`}>
                 {isRunning ? (

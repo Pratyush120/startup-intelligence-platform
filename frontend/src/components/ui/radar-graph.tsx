@@ -10,9 +10,11 @@ const Plot = dynamic(() => import('react-plotly.js'), {
   loading: () => <Skeleton className="w-full h-full bg-muted/50" />
 })
 
+// Plotly's own data/layout props accept unknown[] and unknown per react-plotly.js typings.
+// We use Record<string, unknown> to stay type-safe without depending on @types/plotly.js internals.
 interface RadarGraphProps {
-  data: any[];
-  layout?: any;
+  data: Record<string, unknown>[];
+  layout?: Record<string, unknown>;
 }
 
 export function RadarGraph({ data, layout }: RadarGraphProps) {
@@ -20,7 +22,7 @@ export function RadarGraph({ data, layout }: RadarGraphProps) {
   
   const isDark = resolvedTheme === 'dark';
   
-  const baseLayout = {
+  const baseLayout: Record<string, unknown> = {
     paper_bgcolor: 'transparent',
     plot_bgcolor: 'transparent',
     font: {
