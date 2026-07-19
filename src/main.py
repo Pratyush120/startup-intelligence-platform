@@ -21,6 +21,7 @@ from src.api.pipeline import router as pipeline_router
 from src.api.alerts import router as alerts_router
 from src.api.trends import router as trends_router
 from src.api.modules import router as modules_router
+from src.api.copilot import router as copilot_router
 from src.utils.logger import get_logger
 from src.database.schema import SchemaManager
 from src.database.seeder import seed_database_if_empty
@@ -150,6 +151,7 @@ app.include_router(pipeline_router, prefix="/api/v1")
 app.include_router(alerts_router, prefix="/api/v1")
 app.include_router(trends_router, prefix="/api/v1")
 app.include_router(modules_router, prefix="/api/v1")
+app.include_router(copilot_router, prefix="/api/v1")
 
 if __name__ == "__main__":
     import uvicorn

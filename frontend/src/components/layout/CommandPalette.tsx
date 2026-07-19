@@ -2,14 +2,16 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ArrowRight, Sparkles, Building2, TrendingUp, History } from "lucide-react";
+import { Search, ArrowRight, Sparkles, Building2, TrendingUp, Loader2 } from "lucide-react";
 import { useUIStore } from "@/store/ui.store";
+import { useSearch } from "@/hooks/use-intelligence";
 
 export function CommandPalette() {
   const { isSearchOpen, closeSearch } = useUIStore();
   const [query, setQuery] = useState("");
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { data: searchResults, isLoading } = useSearch(query);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -39,12 +41,14 @@ export function CommandPalette() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      // In a real app, this would route to search results or process via AI.
-      // For now, we will just route to a dummy search page or close.
       closeSearch();
-      // Route to an entity for demo purposes if it looks like a company name
-      router.push(`/entities/demo`);
+      useUIStore.getState().openCopilot(); // Default action: route to AI Copilot
     }
+  };
+
+  const handleSelectEntity = (entityName: string) => {
+    closeSearch();
+    router.push(`/entities/${encodeURIComponent(entityName)}`);
   };
 
   const suggestions = [
@@ -80,7 +84,7 @@ export function CommandPalette() {
           </kbd>
         </form>
 
-        <div className="p-4">
+        <div className="p-4 overflow-y-auto max-h-[50vh]">
           {!query ? (
             <div className="space-y-4">
               <h3 className="text-xs font-mono uppercase tracking-wider text-secondary px-2">Suggested Actions</h3>
@@ -104,17 +108,42 @@ export function CommandPalette() {
               </div>
             </div>
           ) : (
-            <div className="space-y-2">
-              <button
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left text-primary hover:bg-surface-2 transition-colors bg-surface-2/50 border border-border-default"
-                onClick={handleSearch}
-              >
-                <Sparkles className="w-4 h-4 text-signal-positive" />
-                <span className="flex-1">Ask AI to analyze: <strong>"{query}"</strong></span>
-                <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-border-strong bg-surface-3 px-2 py-1 font-mono text-[10px] font-medium text-primary">
-                  ENTER
-                </kbd>
-              </button>
+            <div className="space-y-4">
+              {isLoading ? (
+                <div className="flex items-center justify-center p-4">
+                  <Loader2 className="w-5 h-5 animate-spin text-secondary" />
+                </div>
+              ) : (searchResults?.companies && searchResults.companies.length > 0) ? (
+                <div className="space-y-2">
+                  <h3 className="text-xs font-mono uppercase tracking-wider text-secondary px-2">Companies</h3>
+                  {searchResults.companies.map((company: any) => (
+                    <button
+                      key={company.id || company.name}
+                      onClick={() => handleSelectEntity(company.name)}
+                      className="w-full flex items-center justify-between gap-3 px-3 py-3 rounded-lg text-left text-primary hover:bg-surface-2 transition-colors border border-transparent hover:border-border-default"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Building2 className="w-4 h-4 text-secondary" />
+                        <span className="font-medium">{company.name}</span>
+                      </div>
+                      <span className="text-xs font-mono text-tertiary">Score: {company.growthScore}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              <div className="space-y-2 border-t border-border-default pt-4">
+                <button
+                  className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left text-primary hover:bg-surface-2 transition-colors bg-surface-2/50 border border-border-default"
+                  onClick={handleSearch}
+                >
+                  <Sparkles className="w-4 h-4 text-signal-positive" />
+                  <span className="flex-1">Ask AI Copilot to analyze: <strong>"{query}"</strong></span>
+                  <kbd className="hidden sm:inline-flex items-center gap-1 rounded border border-border-strong bg-surface-3 px-2 py-1 font-mono text-[10px] font-medium text-primary">
+                    ENTER
+                  </kbd>
+                </button>
+              </div>
             </div>
           )}
         </div>

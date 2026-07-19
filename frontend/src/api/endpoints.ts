@@ -12,4 +12,5 @@ export const ENDPOINTS = {
   STRATEGIC_ALERTS: "/alerts",
   TRENDS: "/trends",
   EXECUTIVE_MODULES: "/modules",
+  COPILOT_CHAT: "/copilot/chat",
 } as const;

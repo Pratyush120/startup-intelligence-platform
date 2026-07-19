@@ -75,7 +75,7 @@ export const IntelligenceService = {
   searchEntities: async (query: string): Promise<{ companies: any[], events: any[] }> => {
     try {
       if (!query || query.length < 2) return { companies: [], events: [] };
-      const response = await apiClient.get(`${ENDPOINTS.SEARCH}?query=${encodeURIComponent(query)}`);
+      const response = await apiClient.get(`${ENDPOINTS.SEARCH}?q=${encodeURIComponent(query)}`);
       return response.data.data;
     } catch (e) {
       console.error(e);
@@ -190,6 +190,19 @@ export const IntelligenceService = {
       return response.data.data;
     } catch (e) {
       return [];
+    }
+  },
+
+  askCopilot: async (prompt: string): Promise<any> => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.COPILOT_CHAT, { prompt });
+      return response.data.data;
+    } catch (e) {
+      console.error(e);
+      return {
+        role: "assistant",
+        content: "I encountered an error connecting to the intelligence backend."
+      };
     }
   }
 };

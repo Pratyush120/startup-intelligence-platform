@@ -23,12 +23,14 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
   }, [timelineData, entity]);
 
   const canvasData = entity ? {
-    opportunityScore: 82,
+    opportunityScore: entity.growthScore,
     riskScore: entity.riskScore,
-    momentum: entity.momentum === 'High' ? 88 : entity.momentum === 'Medium' ? 50 : 30,
-    confidence: 94,
-    recommendation: entity.recommendation || `${entity.name} represents a high-potential strategic target due to its accelerating market momentum and recent structural advantages.`,
-    evidence: recentEvents.slice(0, 3).map((e: any) => e.aiSummary)
+    momentum: typeof entity.momentum === 'string' ? (entity.momentum === 'High' ? 88 : entity.momentum === 'Medium' ? 50 : 30) : entity.momentum,
+    confidence: entity.riskScore > 70 ? 75 : 92, // Calculate confidence based on risk
+    recommendation: entity.recommendation || `Based on a growth score of ${entity.growthScore} and risk score of ${entity.riskScore}, ${entity.name} requires careful monitoring.`,
+    evidence: recentEvents.length > 0 
+      ? recentEvents.slice(0, 3).map((e: any) => e.aiSummary || e.businessImpact || e.eventType)
+      : ["No recent significant events detected in the pipeline."]
   } : undefined;
 
   if (loadingEntity) {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X, Sparkles, Send, BookOpen, ShieldAlert, ArrowRight, ExternalLink } from "lucide-react";
 import { useUIStore } from "@/store/ui.store";
 import { Badge } from "@/components/ui/badge";
+import { IntelligenceService } from "@/services/intelligence.service";
 
 export function AICopilot() {
   const { isCopilotOpen, closeCopilot } = useUIStore();
@@ -13,7 +14,7 @@ export function AICopilot() {
 
   if (!isCopilotOpen) return null;
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
 
@@ -23,21 +24,14 @@ export function AICopilot() {
     setQuery("");
     setIsTyping(true);
 
-    // Simulate AI thinking and CERSR response
-    setTimeout(() => {
+    try {
+      const response = await IntelligenceService.askCopilot(currentQuery);
+      setMessages(prev => [...prev, response]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: "assistant", content: "Failed to fetch response." }]);
+    } finally {
       setIsTyping(false);
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        cersr: {
-          confidence: 92,
-          evidence: "Based on 3 recent acquisitions in the healthcare AI space and a 15% increase in funding this quarter.",
-          sources: ["TechCrunch (Oct 12)", "Q3 Funding Report"],
-          reasoning: "The consolidation suggests larger players are acquiring specialized models rather than building in-house.",
-          strategy: "Consider monitoring early-stage startups in this sector as prime acquisition targets."
-        },
-        content: `Analyzing the query: "${currentQuery}"... Market signals indicate strong consolidation.`
-      }]);
-    }, 1500);
+    }
   };
 
   return (
