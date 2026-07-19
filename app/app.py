@@ -3,7 +3,7 @@ Strategic Decision Intelligence Platform
 
 Dashboard Entry Point
 """
-
+# ruff: noqa: E402
 import sys
 from pathlib import Path
 
