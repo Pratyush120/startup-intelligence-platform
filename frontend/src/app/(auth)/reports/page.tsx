@@ -40,8 +40,22 @@ export default function ReportsPage() {
 
       <div className="space-y-6">
         {recommendations.length === 0 ? (
-          <div className="p-12 text-center text-muted-foreground bg-card/40 rounded-xl border border-border">
-            No strategic reports have been generated yet. Trigger a pipeline run to generate insights.
+          <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-border-default rounded-xl bg-surface-1 p-12 text-center animate-in fade-in duration-500">
+             <div className="w-16 h-16 bg-surface-2 rounded-2xl flex items-center justify-center text-secondary mb-6">
+                <FileText className="w-8 h-8" />
+             </div>
+             <h2 className="text-xl font-bold text-primary">No Reports Generated</h2>
+             <p className="text-secondary mt-2 max-w-md mx-auto leading-relaxed">
+                Strategic reports are automatically generated when significant market movements or risks are detected in your watchlist.
+             </p>
+             <div className="mt-8">
+                <button 
+                  onClick={() => router.push('/watchlist')}
+                  className="px-6 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors shadow-sm"
+                >
+                  Configure Watchlist
+                </button>
+             </div>
           </div>
         ) : (
           recommendations.map((rec) => (

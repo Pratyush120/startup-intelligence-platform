@@ -1,16 +1,18 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { use, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge"
 import { BusinessScore } from "@/components/ui/business-score"
-import { ShieldAlert, ExternalLink } from "lucide-react"
+import { ShieldAlert, ExternalLink, Sparkles } from "lucide-react"
 import { useEntity, useTimeline } from "@/hooks/use-intelligence"
+import { AIDecisionCanvas } from "@/components/dashboard/AIDecisionCanvas"
 
 export default function EntityPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   
   const { data: entityData, isLoading: loadingEntity, isError: errorEntity } = useEntity(resolvedParams.id);
   const { data: timelineData, isLoading: loadingTimeline } = useTimeline();
+  const [isCanvasOpen, setIsCanvasOpen] = useState(false);
 
   // The backend currently returns a CompanyMetric for entities. 
   // We'll map it to the UI requirements dynamically.
@@ -19,6 +21,15 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
     if (!timelineData || !entity) return [];
     return timelineData.filter(event => event.companyName === entity.name);
   }, [timelineData, entity]);
+
+  const canvasData = entity ? {
+    opportunityScore: 82,
+    riskScore: entity.riskScore,
+    momentum: entity.momentum === 'High' ? 88 : entity.momentum === 'Medium' ? 50 : 30,
+    confidence: 94,
+    recommendation: entity.recommendation || `${entity.name} represents a high-potential strategic target due to its accelerating market momentum and recent structural advantages.`,
+    evidence: recentEvents.slice(0, 3).map((e: any) => e.aiSummary)
+  } : undefined;
 
   if (loadingEntity) {
     return (
@@ -44,6 +55,13 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
   return (
     <div className="p-8 max-w-5xl mx-auto space-y-12 pb-24">
       
+      <AIDecisionCanvas 
+        isOpen={isCanvasOpen} 
+        onClose={() => setIsCanvasOpen(false)} 
+        entityName={entity.name}
+        data={canvasData!}
+      />
+
       {/* Entity Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 pb-6 border-b border-border">
         <div className="space-y-4">
@@ -63,6 +81,13 @@ export default function EntityPage({ params }: { params: Promise<{ id: string }>
         
         <div className="flex flex-col items-end shrink-0 gap-3">
           <div className="flex items-center gap-2">
+             <button 
+                className="px-4 py-2 bg-signal-positive/10 border border-signal-positive/30 hover:bg-signal-positive/20 text-signal-positive rounded-md text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+                onClick={() => setIsCanvasOpen(true)}
+             >
+                <Sparkles className="w-4 h-4" />
+                Decision Canvas
+             </button>
              <button className="px-4 py-2 bg-surface-2 hover:bg-surface-3 border border-border rounded-md text-sm font-medium transition-colors text-primary flex items-center gap-2">
                 <ExternalLink className="w-4 h-4" />
                 Website
