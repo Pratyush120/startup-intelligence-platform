@@ -1,7 +1,11 @@
 import axios from "axios";
 
+// Prefer explicitly set external URL (e.g., if bypassing Next.js proxy),
+// otherwise fallback to empty string to use relative paths and Next.js rewrites.
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 export const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "/api/v1",
+  baseURL: API_BASE_URL ? `${API_BASE_URL}/api/v1` : "/api/v1",
   headers: {
     "Content-Type": "application/json",
   },
