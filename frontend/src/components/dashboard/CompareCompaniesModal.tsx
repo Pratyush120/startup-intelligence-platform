@@ -18,8 +18,8 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
 
   if (!isOpen) return null;
 
-  const company1 = companies?.find(c => c.company_name === selectedCompany1) || null;
-  const company2 = companies?.find(c => c.company_name === selectedCompany2) || null;
+  const company1 = companies?.find(c => c.name === selectedCompany1) || null;
+  const company2 = companies?.find(c => c.name === selectedCompany2) || null;
 
   const renderMetric = (label: string, value1: any, value2: any, icon: React.ElementType, higherIsBetter = true) => {
     let color1 = "text-primary";
@@ -100,7 +100,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
                     >
                       <option value="">Select a company...</option>
                       {companies?.map(c => (
-                        <option key={`c1-${c.company_name}`} value={c.company_name}>{c.company_name}</option>
+                        <option key={`c1-${c.name}`} value={c.name}>{c.name}</option>
                       ))}
                     </select>
                   </div>
@@ -113,7 +113,7 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
                     >
                       <option value="">Select a company...</option>
                       {companies?.map(c => (
-                        <option key={`c2-${c.company_name}`} value={c.company_name}>{c.company_name}</option>
+                        <option key={`c2-${c.name}`} value={c.name}>{c.name}</option>
                       ))}
                     </select>
                   </div>
