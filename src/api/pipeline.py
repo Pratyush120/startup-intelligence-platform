@@ -14,7 +14,7 @@ async def run_pipeline(background_tasks: BackgroundTasks, repo: Repository = Dep
     def execute_pipeline():
         try:
             orchestrator = PipelineOrchestrator()
-            orchestrator.run_pipeline()
+            orchestrator.run()
         except Exception as e:
             logger.error(f"Background pipeline execution failed: {e}")
 

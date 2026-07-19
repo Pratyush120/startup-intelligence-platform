@@ -72,18 +72,15 @@ def test_search_endpoint():
     assert "events" in data["data"]
 
 
-@patch("src.worker.run_pipeline_task.delay")
-def test_pipeline_run_endpoint(mock_delay):
-    # Mock the return value of delay() which returns an AsyncResult
-    class MockResult:
-        id = "mock_task_id"
-
-    mock_delay.return_value = MockResult()
-
+@patch("src.pipeline.orchestrator.PipelineOrchestrator.run")
+def test_pipeline_run_endpoint(mock_run):
     response = client.post("/api/v1/pipeline/run")
     assert response.status_code == 200
     data = response.json()
     assert data["success"] is True
     assert data["meta"]["status"] == "running"
-    assert data["data"]["task_id"] == "mock_task_id"
-    mock_delay.assert_called_once()
+    assert data["data"]["task_id"] == "local-bg-task"
+    
+    # Wait for FastAPI background tasks to execute
+    # (In TestClient, background tasks are executed after the response is returned)
+    mock_run.assert_called_once()

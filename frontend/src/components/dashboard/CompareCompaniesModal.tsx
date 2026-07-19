@@ -122,12 +122,10 @@ export function CompareCompaniesModal({ isOpen, onClose }: CompareCompaniesModal
                 {/* Comparison Data */}
                 {company1 || company2 ? (
                   <div className="bg-surface-2/30 rounded-xl border border-border-default p-4 sm:p-6">
-                    {renderMetric("Momentum Score", company1?.momentum_score, company2?.momentum_score, Activity, true)}
-                    {renderMetric("Growth Score", company1?.growth_score, company2?.growth_score, TrendingUp, true)}
-                    {renderMetric("Risk Score", company1?.risk_score, company2?.risk_score, AlertTriangle, false)}
-                    {renderMetric("Business Health", company1?.business_health, company2?.business_health, Building2, true)}
-                    {renderMetric("Funding Events", company1?.funding_events, company2?.funding_events, Activity, true)}
-                    {renderMetric("Hiring Events", company1?.hiring_events, company2?.hiring_events, Activity, true)}
+                    {renderMetric("Momentum Score", company1?.momentum, company2?.momentum, Activity, true)}
+                    {renderMetric("Growth Score", company1?.growthScore, company2?.growthScore, TrendingUp, true)}
+                    {renderMetric("Risk Score", company1?.riskScore, company2?.riskScore, AlertTriangle, false)}
+                    {renderMetric("Total Funding", company1?.fundingTotal, company2?.fundingTotal, Activity, true)}
                     
                     {/* Recommendation Row */}
                     <div className="grid grid-cols-2 gap-8 mt-6 pt-4">
