@@ -80,7 +80,7 @@ def test_pipeline_run_endpoint(mock_run):
     assert data["success"] is True
     assert data["meta"]["status"] == "running"
     assert data["data"]["task_id"] == "local-bg-task"
-    
+
     # Wait for FastAPI background tasks to execute
     # (In TestClient, background tasks are executed after the response is returned)
     mock_run.assert_called_once()

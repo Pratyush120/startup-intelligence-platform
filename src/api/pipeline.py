@@ -7,10 +7,14 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 router = APIRouter(tags=["Pipeline"])
+
+
 @router.post("/pipeline/run", response_model=StandardResponse[dict[str, str]])
-async def run_pipeline(background_tasks: BackgroundTasks, repo: Repository = Depends(get_repository)):
+async def run_pipeline(
+    background_tasks: BackgroundTasks, repo: Repository = Depends(get_repository)
+):
     from src.pipeline.orchestrator import PipelineOrchestrator
-    
+
     def execute_pipeline():
         try:
             orchestrator = PipelineOrchestrator()
@@ -19,9 +23,12 @@ async def run_pipeline(background_tasks: BackgroundTasks, repo: Repository = Dep
             logger.error(f"Background pipeline execution failed: {e}")
 
     background_tasks.add_task(execute_pipeline)
-    
+
     return success_response(
-        data={"message": "Pipeline execution started in background.", "task_id": "local-bg-task"},
+        data={
+            "message": "Pipeline execution started in background.",
+            "task_id": "local-bg-task",
+        },
         meta={"status": "running"},
     )
 
