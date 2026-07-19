@@ -17,9 +17,9 @@ export function TopAppBar() {
       
       {/* Global Search / Command Palette Trigger */}
       <div className="flex items-center flex-1">
-        <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-default bg-surface-1 text-secondary hover:text-primary hover:border-border-strong transition-colors w-64 group focus-visible:ring-2 focus-visible:ring-focus outline-none">
+        <button className="flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-default bg-surface-1 text-secondary hover:text-primary hover:border-border-strong transition-colors w-[400px] group focus-visible:ring-2 focus-visible:ring-focus outline-none">
           <Search className="w-4 h-4" />
-          <span className="text-sm">Search intelligence...</span>
+          <span className="text-sm">Analyze a company, market or competitor...</span>
           <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border-default bg-base px-1.5 font-mono text-[10px] font-medium text-tertiary opacity-100 group-hover:opacity-100 transition-opacity">
             <span className="text-xs">⌘</span>K
           </kbd>

@@ -1,10 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import {
   LayoutDashboard,
   Building2,
   LineChart,
   FileText,
-  Settings
+  Settings,
+  Bot
 } from "lucide-react";
 
 export function Sidebar() {
@@ -24,25 +27,30 @@ export function Sidebar() {
           Command Center
         </Link>
         <Link 
-          href="/companies"
+          href="/watchlist"
           className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
         >
           <Building2 className="w-4 h-4" />
-          Companies
-        </Link>
-        <Link 
-          href="/market"
-          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
-        >
-          <LineChart className="w-4 h-4" />
-          Market Intelligence
+          My Watchlist
         </Link>
         <Link 
           href="/reports"
           className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
         >
           <FileText className="w-4 h-4" />
-          Strategy Reports
+          Reports Library
+        </Link>
+        <Link 
+          href="#"
+          className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-surface-2 text-secondary hover:text-primary transition-colors font-medium"
+          onClick={(e) => {
+             e.preventDefault();
+             // Copilot toggle will be implemented via global state/context later
+             alert("Global AI Copilot opening...");
+          }}
+        >
+          <Bot className="w-4 h-4" />
+          AI Copilot
         </Link>
       </nav>
 

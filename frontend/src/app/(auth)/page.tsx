@@ -30,98 +30,94 @@ export default function DashboardPage() {
   const { data: recommendations, isLoading: loadingRecs, isError: errorRecs } = useRecommendations();
 
   return (
-    <div className="flex flex-col gap-10 pb-16">
+    <div className="flex flex-col gap-12 pb-16 pt-4">
       
       {/* 0. Live Intelligence Ticker */}
-      <div className="-mx-6 md:-mx-8 -mt-6 md:-mt-8 mb-2">
+      <div className="-mx-6 md:-mx-8 -mt-10 md:-mt-12 mb-2">
         {loadingTimeline ? (
-          <div className="h-10 bg-slate-900 animate-pulse border-b border-white/10" />
+          <div className="h-10 bg-surface-2 animate-pulse border-b border-border-default" />
         ) : (
           <LiveTicker events={timeline || []} />
         )}
       </div>
 
       <div className="flex items-center justify-between">
-        <h1 className="sr-only">Executive Dashboard</h1>
-        <QuickActionCenter />
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">Good Morning.</h1>
+          <p className="text-secondary mt-2">Here is your strategic intelligence briefing for today.</p>
+        </div>
       </div>
 
-      {/* 1. Hero Narrative Layer */}
-      <section>
-        {loadingBrief ? (
-          <div className="h-48 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : errorBrief ? (
-          <div className="p-4 border border-red-500/50 bg-red-500/10 rounded-xl text-red-200">Failed to load Executive Brief.</div>
-        ) : executiveBrief ? (
-          <ExecutiveBrief data={executiveBrief} />
-        ) : (
-          <div className="p-4 border border-white/10 rounded-xl text-slate-400">No executive brief available.</div>
-        )}
-      </section>
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-2 flex flex-col gap-10">
+          {/* 1. Hero Narrative Layer (Executive Brief) */}
+          <section>
+            {loadingBrief ? (
+              <div className="h-48 bg-surface-2 animate-pulse rounded-xl border border-border-default" />
+            ) : errorBrief ? (
+              <div className="p-4 border border-red-500/50 bg-red-500/10 rounded-xl text-red-200">Failed to load Executive Brief.</div>
+            ) : executiveBrief ? (
+              <ExecutiveBrief data={executiveBrief} />
+            ) : (
+              <div className="p-4 border border-border-default rounded-xl text-secondary">We are currently gathering intelligence.</div>
+            )}
+          </section>
 
-      {/* 2. Strategic Banner (if multiple alerts suggest a macro trend) */}
-      <section>
-        <RecommendationBanner 
-          message="Platform is running in Production mode, analyzing real-time data."
-          evidenceCount={alerts?.length || 0}
-          confidence={92}
-          action="Review Active Alerts"
-        />
-      </section>
+          {/* 2. Actionable Critical Alerts Layer */}
+          <section>
+            <h2 className="text-xl font-semibold text-primary mb-4">High Priority Events</h2>
+            {loadingAlerts ? (
+              <div className="h-32 bg-surface-2 animate-pulse rounded-xl border border-border-default" />
+            ) : alerts && alerts.length > 0 ? (
+              <StrategicAlerts alerts={alerts} />
+            ) : (
+               <div className="p-4 border border-border-default rounded-xl text-secondary text-sm">No high priority alerts overnight.</div>
+            )}
+          </section>
+          
+          {/* 3. Deep Intelligence Layer (Recommendations) */}
+          <section>
+            <h2 className="text-xl font-semibold text-primary mb-4">AI Recommendations</h2>
+            {loadingRecs ? (
+              <div className="h-64 bg-surface-2 animate-pulse rounded-xl border border-border-default" />
+            ) : recommendations && recommendations.length > 0 ? (
+              <RecommendationCenter recommendations={recommendations} />
+            ) : null}
+          </section>
+          
+          {/* 4. Companies Requiring Attention */}
+          <section>
+             <h2 className="text-xl font-semibold text-primary mb-4">Companies Requiring Attention</h2>
+            {loadingCompanies ? (
+              <div className="h-64 bg-surface-2 animate-pulse rounded-xl border border-border-default" />
+            ) : companies && companies.length > 0 ? (
+              <TopCompaniesTable companies={companies.slice(0,5)} />
+            ) : null}
+          </section>
+        </div>
 
-      {/* 3. Actionable Critical Alerts Layer */}
-      <section>
-        {loadingAlerts ? (
-          <div className="h-32 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : alerts && alerts.length > 0 ? (
-          <StrategicAlerts alerts={alerts} />
-        ) : null}
-      </section>
+        <div className="flex flex-col gap-10">
+          {/* 5. Quantitative Layer (Market Signals) */}
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-4">Market Signals</h2>
+            {loadingMetrics ? (
+               <div className="flex flex-col gap-4">
+                 {[1,2,3,4].map(i => <div key={i} className="h-24 bg-surface-2 animate-pulse rounded-xl border border-border-default" />)}
+               </div>
+            ) : metrics && metrics.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                <MetricGrid metrics={metrics} />
+              </div>
+            ) : null}
+          </section>
 
-      {/* 4. Quantitative Layer (Milestone 3) */}
-      <section>
-        {loadingMetrics ? (
-           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             {[1,2,3].map(i => <div key={i} className="h-32 bg-slate-900 animate-pulse rounded-xl border border-white/10" />)}
-           </div>
-        ) : metrics && metrics.length > 0 ? (
-          <MetricGrid metrics={metrics} />
-        ) : null}
-      </section>
-
-      <section>
-        {loadingSnapshot ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : snapshot && snapshot.length > 0 ? (
-          <MarketSnapshotChart data={snapshot} />
-        ) : null}
-      </section>
-
-      <section>
-        {loadingCompanies ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : companies && companies.length > 0 ? (
-          <TopCompaniesTable companies={companies} />
-        ) : null}
-      </section>
-
-      {/* 5. Deep Intelligence Layer (Milestone 4) */}
-      <section>
-        {loadingRecs ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : recommendations && recommendations.length > 0 ? (
-          <RecommendationCenter recommendations={recommendations} />
-        ) : null}
-      </section>
-
-      <section>
-        {loadingTimeline ? (
-          <div className="h-64 bg-slate-900 animate-pulse rounded-xl border border-white/10" />
-        ) : timeline && timeline.length > 0 ? (
-          <IntelligenceTimeline events={timeline} />
-        ) : null}
-      </section>
-
+          {/* Quick Access */}
+          <section>
+            <h2 className="text-lg font-semibold text-primary mb-4">Quick Access</h2>
+            <QuickActionCenter />
+          </section>
+        </div>
+      </div>
     </div>
   );
 }

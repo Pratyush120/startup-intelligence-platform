@@ -29,7 +29,7 @@ export function MetricGrid({ metrics }: MetricGridProps) {
       variants={containerVariants}
       initial="hidden"
       animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+      className="grid grid-cols-1 sm:grid-cols-2 gap-4"
     >
       {metrics.map((metric) => (
         <motion.div key={metric.id} variants={itemVariants}>
