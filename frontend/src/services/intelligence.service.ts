@@ -125,6 +125,26 @@ export const IntelligenceService = {
     }
   },
 
+  runPipeline: async (): Promise<any> => {
+    try {
+      const response = await apiClient.post(ENDPOINTS.PIPELINE_RUN);
+      return response.data;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  },
+
+  getPipelineStatus: async (): Promise<any> => {
+    try {
+      const response = await apiClient.get(ENDPOINTS.PIPELINE_STATUS);
+      return response.data.data;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+
   getMetrics: async (): Promise<MetricCard[]> => {
     // Derive metrics from market snapshot
     try {

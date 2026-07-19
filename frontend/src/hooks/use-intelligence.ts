@@ -101,3 +101,29 @@ export function useExecutiveModules() {
     staleTime: STALE_TIME,
   });
 }
+
+export function usePipelineStatus() {
+  return useQuery({
+    queryKey: ["pipelineStatus"],
+    queryFn: IntelligenceService.getPipelineStatus,
+    staleTime: 0, // Always fetch latest status
+    refetchInterval: 5000, // Poll every 5s if active, could be dynamic
+  });
+}
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+export function useRunPipeline() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: IntelligenceService.runPipeline,
+    onSuccess: () => {
+      // Invalidate queries to refresh data across the app
+      queryClient.invalidateQueries({ queryKey: ["pipelineStatus"] });
+      queryClient.invalidateQueries({ queryKey: ["executiveBrief"] });
+      queryClient.invalidateQueries({ queryKey: ["topCompanies"] });
+      queryClient.invalidateQueries({ queryKey: ["timeline"] });
+    },
+  });
+}

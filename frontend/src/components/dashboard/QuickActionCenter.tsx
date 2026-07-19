@@ -2,8 +2,43 @@
 
 import { motion } from "framer-motion";
 import { FileText, GitCompare, RefreshCw, Download, LineChart, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRunPipeline } from "@/hooks/use-intelligence";
+import { toast } from "sonner";
 
 export function QuickActionCenter() {
+  const router = useRouter();
+  const runPipelineMutation = useRunPipeline();
+
+  const handleAction = (id: string) => {
+    switch (id) {
+      case 'report':
+        router.push('/reports');
+        break;
+      case 'compare':
+        // Trigger command palette or navigate to a compare page
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+        break;
+      case 'refresh':
+        toast("Pipeline triggered", { description: "Data ingestion process has started in the background." });
+        runPipelineMutation.mutate(undefined, {
+          onSuccess: () => toast.success("Pipeline execution complete"),
+          onError: () => toast.error("Pipeline execution failed")
+        });
+        break;
+      case 'export':
+        window.print();
+        break;
+      case 'analyze':
+        // Trigger command palette to search
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }));
+        break;
+      case 'market':
+        router.push('/market');
+        break;
+    }
+  };
+
   const actions = [
     { id: 'report', label: 'Generate Report', icon: FileText, shortcut: '⌘R' },
     { id: 'compare', label: 'Compare Companies', icon: GitCompare, shortcut: '⌘C' },
@@ -19,12 +54,13 @@ export function QuickActionCenter() {
         {actions.map(action => (
           <motion.button
             key={action.id}
+            onClick={() => handleAction(action.id)}
             whileHover={{ y: -1 }}
             whileTap={{ y: 0 }}
             className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-md bg-base border border-border-default text-secondary hover:text-primary hover:border-border-strong transition-colors focus-visible:ring-2 focus-visible:ring-focus outline-none group relative"
             title={`${action.label} (${action.shortcut})`}
           >
-            <action.icon className="w-4 h-4 text-tertiary group-hover:text-primary transition-colors" />
+            <action.icon className={`w-4 h-4 text-tertiary group-hover:text-primary transition-colors ${action.id === 'refresh' && runPipelineMutation.isPending ? 'animate-spin' : ''}`} />
             <span className="caption-md font-medium">{action.label}</span>
           </motion.button>
         ))}
