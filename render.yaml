@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sdip-backend
+    name: startup-intelligence-platform-1
     env: python
     buildCommand: "pip install -r requirements.txt"
     startCommand: "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
