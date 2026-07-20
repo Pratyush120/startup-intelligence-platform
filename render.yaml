@@ -10,7 +10,7 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: CORS_ORIGINS
-        value: '["https://startup-intelligence-platform-1.onrender.com", "https://sdip-frontend.vercel.app", "http://localhost:3000"]'
+        value: '["https://startup-intelligence-platform-1.onrender.com", "https://startup-intelligence-platform-frontend.onrender.com", "https://sdip-frontend.vercel.app", "http://localhost:3000"]'
       - key: GEMINI_API_KEY
         sync: false
       - key: SERP_API_KEY
@@ -19,3 +19,15 @@ services:
         sync: false
       - key: FINNHUB_API_KEY
         sync: false
+
+  - type: web
+    name: startup-intelligence-platform-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm run start"
+    envVars:
+      - key: NODE_VERSION
+        value: 20.x
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: "https://startup-intelligence-platform-1.onrender.com"
