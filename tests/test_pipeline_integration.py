@@ -15,7 +15,7 @@ from datetime import datetime, timezone
 from src.pipeline.preprocessor import Preprocessor
 from src.pipeline.deduplicator import Deduplicator
 from src.pipeline.importance_scorer import ImportanceScorer
-from src.pipeline.llm_analyzer import LLMAnalyzer, LLMAnalysis
+from src.pipeline.llm_analyzer import LLMAnalyzer
 from src.pipeline.sparkline_generator import SparklineGenerator
 
 os.environ["GEMINI_API_KEY"] = "test_key"
@@ -77,10 +77,11 @@ class TestPipelineIntegration(unittest.TestCase):
 
 
 class TestLLMFallback(unittest.TestCase):
-    @patch('src.pipeline.llm_analyzer.GeminiProvider.analyze_event')
+    @patch("src.pipeline.llm_analyzer.GeminiProvider.analyze_event")
     def test_rule_based_fallback_returns_analysis(self, mock_analyze):
         # Mock Gemini response
         from src.models.intelligence import EventAnalysisResponse
+
         mock_analyze.return_value = EventAnalysisResponse(
             executive_summary="Fallback summary",
             business_impact="Fallback impact",
@@ -89,9 +90,9 @@ class TestLLMFallback(unittest.TestCase):
             key_insight="Test",
             confidence=0.5,
             token_usage=0,
-            processing_time_ms=10
+            processing_time_ms=10,
         )
-        
+
         analyzer = LLMAnalyzer()
         result = analyzer.analyze(
             title="OpenAI raises $6.6B",

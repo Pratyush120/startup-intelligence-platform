@@ -16,11 +16,12 @@ async def get_timeline(
     repo: Repository = Depends(get_repository),
 ):
     from src.services.intelligence_aggregator import IntelligenceAggregator
+
     events = repo.get_recent_events(limit=limit, offset=offset, event_type=event_type)
 
     agg = IntelligenceAggregator(repo)
     global_ctx = await agg.build_global_context("startup funding news")
-    
+
     live_news = global_ctx.get("latest_news", [])
     for n in live_news:
         events.append(
@@ -38,6 +39,7 @@ async def get_timeline(
     # Sort combined events by published_at (descending)
     def parse_date(e):
         return e.get("published_at", "")
+
     events.sort(key=parse_date, reverse=True)
 
     serialized = serialize_timeline_events(events[:limit])

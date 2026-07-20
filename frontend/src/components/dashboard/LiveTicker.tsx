@@ -15,11 +15,10 @@ export function LiveTicker({ events }: LiveTickerProps) {
   useEffect(() => {
     if (!events.length) return;
     const interval = setInterval(() => {
-      if (!events[currentIndex]) return;
       setCurrentIndex((prev) => (prev + 1) % events.length);
     }, 4000); // Cycle every 4 seconds
     return () => clearInterval(interval);
-  }, [events.length, currentIndex]);
+  }, [events]);
 
   if (!events.length) return null;
 

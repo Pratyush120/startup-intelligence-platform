@@ -11,10 +11,12 @@ from src.pipeline.api_serializer import (
 
 router = APIRouter(tags=["Search"])
 
+
 class CompanyProxy:
     def __init__(self, data: dict):
         for k, v in data.items():
             setattr(self, k, v)
+
 
 @router.get("/search", response_model=StandardResponse[dict[str, Any]])
 async def search(
@@ -28,8 +30,12 @@ async def search(
 
     # Convert db dictionary to list format expected by serializer
     db_company = global_context.get("company", {})
-    companies = [db_company] if isinstance(db_company, dict) and "company_name" in db_company else []
-    
+    companies = (
+        [db_company]
+        if isinstance(db_company, dict) and "company_name" in db_company
+        else []
+    )
+
     events = global_context.get("db_events", [])
     latest_news = global_context.get("latest_news", [])
 

@@ -34,7 +34,7 @@ export function OmniSearchDialog() {
     }
     document.addEventListener("keydown", down)
     return () => document.removeEventListener("keydown", down)
-  }, [])
+  }, [toggleSearch])
 
   const runCommand = React.useCallback((command: () => void) => {
     closeSearch()

@@ -1,5 +1,5 @@
 import asyncio
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any
 from datetime import datetime, timezone
 import hashlib
 
@@ -8,11 +8,12 @@ from src.services.providers.serp_provider import SerpProvider
 from src.services.providers.news_provider import NewsProvider
 from src.services.providers.finnhub_provider import FinnhubProvider
 from src.services.normalizers.serp_normalizer import SerpNormalizer
-from src.models.intelligence import CompanyProfile, NewsArticle, TimelineEvent, FinancialMetric
+from src.models.intelligence import CompanyProfile, NewsArticle, FinancialMetric
 from src.utils.cache import global_cache
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class IntelligenceAggregator:
     def __init__(self, repo: Repository):
@@ -26,10 +27,10 @@ class IntelligenceAggregator:
         cached = global_cache.get(cache_key)
         if cached:
             return cached
-            
+
         raw = await self.serp.search_news(f"{query} startup OR company")
         normalized = SerpNormalizer.normalize_news(raw)
-        global_cache.set(cache_key, normalized, ttl_seconds=1800) # 30 min
+        global_cache.set(cache_key, normalized, ttl_seconds=1800)  # 30 min
         return normalized
 
     async def _fetch_newsapi(self, query: str) -> List[NewsArticle]:
@@ -37,9 +38,9 @@ class IntelligenceAggregator:
         cached = global_cache.get(cache_key)
         if cached:
             return cached
-            
+
         articles = await self.news.fetch_news(query)
-        global_cache.set(cache_key, articles, ttl_seconds=900) # 15 min
+        global_cache.set(cache_key, articles, ttl_seconds=900)  # 15 min
         return articles
 
     async def _fetch_finnhub(self, query: str) -> List[FinancialMetric]:
@@ -47,9 +48,9 @@ class IntelligenceAggregator:
         cached = global_cache.get(cache_key)
         if cached:
             return cached
-            
+
         financials = await self.finnhub.fetch_financials(query)
-        global_cache.set(cache_key, financials, ttl_seconds=1800) # 30 min
+        global_cache.set(cache_key, financials, ttl_seconds=1800)  # 30 min
         return financials
 
     def _fetch_db_company(self, query: str) -> Dict[str, Any]:
@@ -83,7 +84,7 @@ class IntelligenceAggregator:
             else:
                 score += 0.5
             return score
-            
+
         # Basic sort by score (descending)
         return sorted(articles, key=get_score, reverse=True)
 
@@ -94,7 +95,7 @@ class IntelligenceAggregator:
             self._fetch_serp(company_name),
             self._fetch_newsapi(company_name),
             self._fetch_finnhub(company_name),
-            return_exceptions=True
+            return_exceptions=True,
         )
 
         db_company, serp_news, newsapi_articles, financials = results
@@ -111,10 +112,9 @@ class IntelligenceAggregator:
 
         all_news = serp_news + newsapi_articles
         unique_news = self._deduplicate_news(all_news)
-        ranked_news = self._rank_news(unique_news)
 
         from src.models.intelligence import SourceAttribution
-        
+
         return CompanyProfile(
             company_name=db_company.get("company_name", company_name),
             website=db_company.get("website"),
@@ -123,12 +123,12 @@ class IntelligenceAggregator:
             source=SourceAttribution(
                 provider="Aggregator",
                 retrieved_at=datetime.now(timezone.utc).isoformat(),
-                confidence=0.95
+                confidence=0.95,
             ),
             # Keep top 10 news for context
-            competitors=[] 
+            competitors=[],
         )
-        
+
     async def build_global_context(self, query: str) -> Dict[str, Any]:
         # Fetch everything concurrently
         results = await asyncio.gather(
@@ -137,23 +137,28 @@ class IntelligenceAggregator:
             self._fetch_serp(query),
             self._fetch_newsapi(query),
             self._fetch_finnhub(query),
-            return_exceptions=True
+            return_exceptions=True,
         )
-        
+
         db_company, db_events, serp_news, newsapi_articles, financials = results
-        
-        if isinstance(db_company, Exception): db_company = {}
-        if isinstance(db_events, Exception): db_events = []
-        if isinstance(serp_news, Exception): serp_news = []
-        if isinstance(newsapi_articles, Exception): newsapi_articles = []
-        if isinstance(financials, Exception): financials = []
+
+        if isinstance(db_company, Exception):
+            db_company = {}
+        if isinstance(db_events, Exception):
+            db_events = []
+        if isinstance(serp_news, Exception):
+            serp_news = []
+        if isinstance(newsapi_articles, Exception):
+            newsapi_articles = []
+        if isinstance(financials, Exception):
+            financials = []
 
         all_news = self._rank_news(self._deduplicate_news(serp_news + newsapi_articles))
-        
+
         return {
             "company": db_company.get("company_name", query),
             "business_summary": db_company.get("sector", ""),
             "financials": financials,
             "latest_news": all_news[:5],
-            "db_events": db_events
+            "db_events": db_events,
         }

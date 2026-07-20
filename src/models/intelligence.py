@@ -1,12 +1,14 @@
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
+
 class SourceAttribution(BaseModel):
     provider: str
     url: Optional[str] = None
     retrieved_at: str
     confidence: float
     provider_id: Optional[str] = None
+
 
 class NewsArticle(BaseModel):
     title: str
@@ -16,6 +18,7 @@ class NewsArticle(BaseModel):
     snippet: str
     source: SourceAttribution
 
+
 class TimelineEvent(BaseModel):
     title: str
     event_type: str
@@ -23,11 +26,13 @@ class TimelineEvent(BaseModel):
     description: str
     source: SourceAttribution
 
+
 class Trend(BaseModel):
     keyword: str
     momentum: float
     timeframe: str = "7d"
     source: SourceAttribution
+
 
 class MarketSignal(BaseModel):
     signal_type: str
@@ -35,16 +40,19 @@ class MarketSignal(BaseModel):
     impact_score: float
     source: SourceAttribution
 
+
 class FinancialMetric(BaseModel):
     metric_name: str
     value: float
     currency: Optional[str] = "USD"
     source: SourceAttribution
 
+
 class Competitor(BaseModel):
     name: str
     similarity_score: float
     source: SourceAttribution
+
 
 class CompanyProfile(BaseModel):
     company_name: str
@@ -55,10 +63,12 @@ class CompanyProfile(BaseModel):
     competitors: List[Competitor] = Field(default_factory=list)
     source: SourceAttribution
 
+
 class Recommendation(BaseModel):
     action: str
     reasoning: str
     impact: str
+
 
 class ExecutiveBrief(BaseModel):
     summary: str
@@ -67,6 +77,7 @@ class ExecutiveBrief(BaseModel):
     growth_outlook: str
     signals: List[MarketSignal] = Field(default_factory=list)
     trends: List[Trend] = Field(default_factory=list)
+
 
 class CopilotResponse(BaseModel):
     summary: str
@@ -77,6 +88,7 @@ class CopilotResponse(BaseModel):
     competitor_perspective: str = ""
     confidence: float
     sources: List[str] = Field(default_factory=list)
+
 
 class EventAnalysisResponse(BaseModel):
     executive_summary: str = ""

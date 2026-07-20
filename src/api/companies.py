@@ -58,9 +58,10 @@ async def get_company(id: str, repo: Repository = Depends(get_repository)):
     clean_id = id.replace("c_", "").replace("_", " ")
 
     from src.services.intelligence_aggregator import IntelligenceAggregator
+
     aggregator = IntelligenceAggregator(repo)
     profile = await aggregator.build_company_intelligence(clean_id)
-    
+
     if not profile or not profile.company_name:
         return error_response(["Company not found."])
 
@@ -70,10 +71,10 @@ async def get_company(id: str, repo: Repository = Depends(get_repository)):
         "company_name": profile.company_name,
         "website": profile.website,
         "sector": profile.description,
-        "business_health": 85.0, # Mock since we'd need to extract from profile
+        "business_health": 85.0,  # Mock since we'd need to extract from profile
         "momentum_score": 90.0,
     }
-    
+
     history = repo.get_company_history(profile.company_name)
     if not history:
         history = [85.0]
@@ -83,9 +84,9 @@ async def get_company(id: str, repo: Repository = Depends(get_repository)):
     serialized = serialize_company_metrics(
         [CompanyProxy(c_dict)], {profile.company_name: history[-5:]}
     )
-    
+
     # Inject live financials and news into the final dict
     resp_data = serialized[0]
     resp_data["liveFinancials"] = [f.model_dump() for f in profile.financials]
-    
+
     return success_response(data=resp_data)

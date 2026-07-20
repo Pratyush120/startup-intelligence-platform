@@ -15,20 +15,23 @@ async def get_recommendations(
     repo: Repository = Depends(get_repository),
 ):
     from src.services.intelligence_aggregator import IntelligenceAggregator
+
     agg = IntelligenceAggregator(repo)
     ctx = await agg.build_global_context("startup investment recommendations")
-    
+
     recommendations = repo.get_recommendations(limit=limit, offset=offset)
-    
+
     # Enhance with live aggregator context
     live_news = ctx.get("latest_news", [])
     if live_news:
-        recommendations.append({
-            "target_entity": live_news[0].title[:50],
-            "action_type": "MONITOR",
-            "reasoning": f"Live Signal: {live_news[0].snippet}",
-            "impact_score": 8.0
-        })
+        recommendations.append(
+            {
+                "target_entity": live_news[0].title[:50],
+                "action_type": "MONITOR",
+                "reasoning": f"Live Signal: {live_news[0].snippet}",
+                "impact_score": 8.0,
+            }
+        )
 
     serialized = serialize_recommendations(recommendations)
 

@@ -1,6 +1,5 @@
 import os
 import json
-from typing import Optional
 from pydantic import ValidationError
 from google import genai
 
@@ -9,6 +8,7 @@ from src.utils.logger import get_logger
 from pydantic import BaseModel
 
 logger = get_logger(__name__)
+
 
 class EventAnalysisResponse(BaseModel):
     executive_summary: str = ""
@@ -22,12 +22,15 @@ class EventAnalysisResponse(BaseModel):
     token_usage: int = 0
     processing_time_ms: int = 0
 
+
 class GeminiProvider:
     def __init__(self):
         self.api_key = os.getenv("GEMINI_API_KEY")
         if not self.api_key:
-            raise ValueError("Configuration Error: GEMINI_API_KEY environment variable is required.")
-        
+            raise ValueError(
+                "Configuration Error: GEMINI_API_KEY environment variable is required."
+            )
+
         self.model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
         try:
             self.client = genai.Client(api_key=self.api_key)
@@ -35,7 +38,9 @@ class GeminiProvider:
             logger.error(f"Failed to initialize Gemini Client: {e}")
             raise
 
-    def analyze_strategic_context(self, context_data: dict, user_prompt: str) -> CopilotResponse:
+    def analyze_strategic_context(
+        self, context_data: dict, user_prompt: str
+    ) -> CopilotResponse:
         system_instruction = (
             "You are the Strategic Decision Intelligence Copilot.\n\n"
             "You help executives, investors, analysts and founders.\n\n"
@@ -49,20 +54,35 @@ class GeminiProvider:
             "Confidence Level\n"
             "Sources Used"
         )
-        
+
         # Build structured context Markdown
         structured_context = []
         if "company" in context_data:
             structured_context.append(f"### Company: {context_data['company']}")
         if "business_summary" in context_data:
-            structured_context.append(f"**Business Summary:** {context_data['business_summary']}")
+            structured_context.append(
+                f"**Business Summary:** {context_data['business_summary']}"
+            )
         if "financials" in context_data and context_data["financials"]:
-            structured_context.append("**Financial Summary:**\n" + "\n".join(f"- {f.metric_name}: {f.value}" for f in context_data["financials"]))
+            structured_context.append(
+                "**Financial Summary:**\n"
+                + "\n".join(
+                    f"- {f.metric_name}: {f.value}" for f in context_data["financials"]
+                )
+            )
         if "latest_news" in context_data and context_data["latest_news"]:
-            structured_context.append("**Latest News:**\n" + "\n".join(f"- {n.title} ({n.publisher})" for n in context_data["latest_news"]))
+            structured_context.append(
+                "**Latest News:**\n"
+                + "\n".join(
+                    f"- {n.title} ({n.publisher})" for n in context_data["latest_news"]
+                )
+            )
         if "competitors" in context_data and context_data["competitors"]:
-            structured_context.append("**Competitors:**\n" + "\n".join(f"- {c.name}" for c in context_data["competitors"]))
-        
+            structured_context.append(
+                "**Competitors:**\n"
+                + "\n".join(f"- {c.name}" for c in context_data["competitors"])
+            )
+
         context_text = "\n\n".join(structured_context)
         full_prompt = f"Context:\n{context_text}\n\nUser Question:\n{user_prompt}"
 
@@ -75,30 +95,32 @@ class GeminiProvider:
                     response_mime_type="application/json",
                     response_schema=CopilotResponse,
                     temperature=0.4,
-                )
+                ),
             )
-            
+
             json_str = response.text
             if not json_str:
                 raise RuntimeError("Empty response from Gemini")
-                
+
             parsed = json.loads(json_str)
             return CopilotResponse(**parsed)
-            
+
         except ValidationError as e:
             logger.error(f"Failed to parse Gemini structured response: {e}")
             raise RuntimeError(f"Gemini API returned malformed data: {e}")
         except Exception as e:
             logger.error(f"Gemini API request failed: {e}")
             raise RuntimeError(f"Gemini API failure: {e}")
-            
-    def analyze_event(self, title: str, description: str, event_type: str, company: str) -> EventAnalysisResponse:
+
+    def analyze_event(
+        self, title: str, description: str, event_type: str, company: str
+    ) -> EventAnalysisResponse:
         system_instruction = (
             "You are a senior investment analyst. Analyze this startup news event.\n"
             "Return a JSON object with: executive_summary, business_impact, strategic_recommendation, "
             "risk, opportunity, key_insight, confidence (float)."
         )
-        
+
         full_prompt = f"Company: {company}\nEvent Type: {event_type}\nHeadline: {title}\nDetails: {description}"
 
         try:
@@ -110,7 +132,7 @@ class GeminiProvider:
                     response_mime_type="application/json",
                     response_schema=EventAnalysisResponse,
                     temperature=0.3,
-                )
+                ),
             )
             json_str = response.text
             if not json_str:
