@@ -43,7 +43,10 @@ export default function DashboardPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-primary">Good Morning.</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight text-primary">Good Morning.</h1>
+            <span className="bg-signal-intelligence/20 text-signal-intelligence border border-signal-intelligence/30 px-2 py-0.5 rounded-full text-xs font-mono font-bold tracking-widest uppercase mt-1">SDIP v2.0 (Render Edition)</span>
+          </div>
           <p className="text-secondary mt-2">Here is your strategic intelligence briefing for today.</p>
         </div>
       </div>
