@@ -35,7 +35,7 @@ async def get_executive_brief(repo: Repository = Depends(get_repository)):
 
     return success_response(
         data={
-            "id": "latest",
+            "id": brief.get("id", "latest"),
             "date": brief.get("generated_at", ""),
             "marketHealthScore": brief.get("market_health_score", 0),
             "investmentClimate": brief.get("investment_climate", "Neutral"),
