@@ -5,6 +5,7 @@ Handles all low-level SQLite database operations.
 """
 
 import sqlite3
+import threading
 
 from config.config import Config
 from src.utils.logger import get_logger
@@ -29,24 +30,30 @@ class Database:
         # Return rows as dictionaries instead of tuples
         self.connection.row_factory = sqlite3.Row
 
-        self.cursor = self.connection.cursor()
+        # Use thread-local storage for cursors to support concurrent threaded asyncio calls
+        self.local = threading.local()
 
         logger.info("Connected to SQLite database.")
+
+    def _get_cursor(self):
+        if not hasattr(self.local, "cursor"):
+            self.local.cursor = self.connection.cursor()
+        return self.local.cursor
 
     def execute(self, query, params=()):
         """
         Execute a single SQL query.
         """
-
-        self.cursor.execute(query, params)
+        cursor = self._get_cursor()
+        cursor.execute(query, params)
         self.connection.commit()
 
     def executemany(self, query, params):
         """
         Execute multiple SQL statements.
         """
-
-        self.cursor.executemany(query, params)
+        cursor = self._get_cursor()
+        cursor.executemany(query, params)
         self.connection.commit()
 
     def fetchone(self):
@@ -54,14 +61,14 @@ class Database:
         Fetch one row.
         """
 
-        return self.cursor.fetchone()
+        return self._get_cursor().fetchone()
 
     def fetchall(self):
         """
         Fetch all rows.
         """
 
-        return self.cursor.fetchall()
+        return self._get_cursor().fetchall()
 
     def begin_transaction(self):
         """
