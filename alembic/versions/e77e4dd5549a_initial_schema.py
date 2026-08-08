@@ -168,6 +168,7 @@ def upgrade() -> None:
             suggested_action  TEXT,
             related_companies TEXT,
             related_event_ids TEXT,
+            evidence_list     TEXT,
             generated_at      TEXT NOT NULL,
             is_active         INTEGER DEFAULT 1
         )

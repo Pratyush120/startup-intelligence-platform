@@ -330,8 +330,8 @@ class Repository:
                     title, reason, priority, confidence, evidence_score,
                     strategic_impact, opportunity_est, risk_est,
                     suggested_action, related_companies, related_event_ids,
-                    generated_at, is_active
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,1)
+                    evidence_list, generated_at, is_active
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,1)
                 """,
                 (
                     rec.get("title", ""),
@@ -345,6 +345,7 @@ class Repository:
                     rec.get("suggested_action", ""),
                     json.dumps(rec.get("related_companies", [])),
                     json.dumps(rec.get("related_event_ids", [])),
+                    json.dumps(rec.get("evidence", [])),
                     now,
                 ),
             )
