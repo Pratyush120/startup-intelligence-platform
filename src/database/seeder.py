@@ -15,10 +15,18 @@ import subprocess
 logger = get_logger(__name__)
 
 
-def seed_hackathon_data():
+def seed_database_if_empty():
     repo = Repository()
 
-    logger.info("Seeding Hackathon Demo Data...")
+    # Check if we already have companies
+    repo.db.execute("SELECT COUNT(*) as count FROM companies")
+    row = repo.db.fetchone()
+    if row and row["count"] > 0:
+        logger.info("Database already contains data. Skipping hackathon seed.")
+        repo.close()
+        return
+
+    logger.info("Database is empty. Seeding Hackathon Demo Data...")
     now = datetime.now(timezone.utc)
     today = now.strftime("%Y-%m-%d")
 
@@ -233,4 +241,4 @@ if __name__ == "__main__":
     logger.info("Running database migrations...")
     subprocess.run(["alembic", "upgrade", "head"], check=True)
     
-    seed_hackathon_data()
+    seed_database_if_empty()
