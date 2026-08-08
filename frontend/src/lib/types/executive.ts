@@ -49,7 +49,7 @@ export interface Recommendation {
   evidence: string[];
   confidence: number;
   suggestedAction: string;
-  priority: 'High' | 'Medium' | 'Low';
+  priority: 'Critical' | 'High' | 'Medium' | 'Low';
   strategicImpact: string;
   estimatedOpportunity: string;
   estimatedRisk: string;
